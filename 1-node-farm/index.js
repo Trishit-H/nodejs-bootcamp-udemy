@@ -1,5 +1,7 @@
 const fs = require('fs');
 const http = require('http');
+const path = require('path');
+const url = require('url');
 
 //<-------------------------------------------- FILE READING AND WRITING -------------------------------------------->//
 
@@ -30,7 +32,23 @@ const http = require('http');
 
 //<-------------------------------------------------- SERVER -------------------------------------------------->//
 const server = http.createServer((req, res) => {
-    res.end('Hello from the server!')
+
+    const pathName = req.url;
+
+    if (pathName === '/' || pathName === '/overview') {
+        res.end('This is OVERVIEW!')
+    } else if (pathName === '/product') {
+        res.end('This is PRODUCT!')
+    } else {
+        // first paramter - status code
+        // second parameter - headers object. header is the information about the response that we send back to the browser
+        // header and status code needs to be sent before the repsonse
+        res.writeHead(404, {
+            'Content-type': 'text/html', // this means the browser is expecting some html as response
+            'my-own-header': 'this-is-a-made-up-header' // we can also make our own header and send it
+        })
+        res.end('<h1>Page not found!</h1>')
+    }
 });
 
 // first parameter - PORT number, second parameter - address of localhost. This is optional.
