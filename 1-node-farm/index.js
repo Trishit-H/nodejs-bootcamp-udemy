@@ -30,6 +30,20 @@ const url = require('url');
 
 
 //<----------------------------------------- SERVER -------------------------------------------->//
+
+// we moved this upward because we don't want to read the file everytime a request to /api is made
+// we only read it once and store it in a variable and send the data
+// also we change the readFile to readFileSync because we only read it once
+
+// here __dirname means the directory the file is located at
+// whereas ./ means the current directory from where we are executing our script
+// so if we were to write './dev-tools/data.json' and the run the index.js file from the desktop, then . here would mean desktop and the not directory the index.js is inside
+// so it's best practice to use __dirname instead of ./
+// EXCEPTION - when using the require() function to import our own modules. in that case the . means the current directry and not the directory from where the script is being executed
+const data = fs.readFileSync(`${__dirname}/dev-data/data.json`, 'utf-8')
+// this method converts JSON string to a JavaScript object
+const dataObj = JSON.parse(data);
+
 const server = http.createServer((req, res) => {
 
     const pathName = req.url;
@@ -39,24 +53,11 @@ const server = http.createServer((req, res) => {
     } else if (pathName === '/product') {
         res.end('This is PRODUCT!')
     } else if (pathName === '/api') {
-
-        // here __dirname means the directory the file is located at
-        // whereas ./ means the current directory from where we are executing our script
-        // so if we were to write './dev-tools/data.json' and the run the index.js file from the desktop, then . here would mean desktop and the not directory the index.js is inside
-        // so it's best practice to use __dirname instead of ./
-        // EXCEPTION - when using the require() function to import our own modules. in that case the . means the current directry and not the directory from where the script is being executed
-        fs.readFile(`${__dirname}/dev-data/data.json`, 'utf-8', (err, data) => {
-
-            // this method converts JSON string to a JavaScript object
-            const productData = JSON.parse(data);
-
-            // we specify the content type to be application/json since we are sending json data
-            res.writeHead(200, {
-                'Content-Type': 'application/json',
-            })
-
-            res.end(data);
+        // we specify the content type to be application/json since we are sending json data
+        res.writeHead(200, {
+            'Content-Type': 'application/json',
         })
+        res.end(data);
     } else {
         // first paramter - status code
         // second parameter - headers object. header is the information about the response that we send back to the browser
