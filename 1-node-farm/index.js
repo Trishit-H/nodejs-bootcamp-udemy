@@ -3,6 +3,12 @@ const http = require('http');
 const path = require('path');
 const url = require('url');
 
+// we use slugify to create slugs.
+// slug is a basically the last part of the url that contains a unique string that identifies the resource that the website is displaying
+// eg: in our node-farm project instead of 127.0.0.1:8000/product?id=0 we could have 127.0.0.1:8000/fresh-avocados
+// so here 'fresh-avocados' is the slug
+const slugify = require('slugify');
+
 const replaceTemplate = require('./modules/replaceTemplate');
 
 //<------------------------------------- FILE READING AND WRITING --------------------------------->//
@@ -52,6 +58,9 @@ const templateOverview = fs.readFileSync(`${__dirname}/templates/template-overvi
 const templateCard = fs.readFileSync(`${__dirname}/templates/template-card.html`, 'utf-8');
 const templateProduct = fs.readFileSync(`${__dirname}/templates/template-product.html`, 'utf-8');
 
+// generated slugs
+const slugs = dataObj.map(el => slugify(el.productName, { lower: true }))
+console.log(slugs);
 
 // everytime we make a request, this createServer function is executed
 const server = http.createServer((req, res) => {
