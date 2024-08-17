@@ -44,20 +44,62 @@ const data = fs.readFileSync(`${__dirname}/dev-data/data.json`, 'utf-8')
 // this method converts JSON string to a JavaScript object
 const dataObj = JSON.parse(data);
 
+// similarly we read the template at the top because we only want it read and storedto memory once and not everytime a route is hit
+const templateOverview = fs.readFileSync(`${__dirname}/templates/template-overview.html`, 'utf-8');
+const templateCard = fs.readFileSync(`${__dirname}/templates/template-card.html`, 'utf-8');
+const templateProduct = fs.readFileSync(`${__dirname}/templates/template-product.html`, 'utf-8');
+
+// we use the replace method to replace the placeholder with the data from data.json
+const replaceTemplate = (template, product) => {
+    let output = template.replace(/{%PRODUCT_NAME%}/g, product.productName);
+    output = output.replace(/{%QUANTITY%}/g, product.quantity);
+    output = output.replace(/{%PRICE%}/g, product.price);
+    output = output.replace(/{%NUTRIENTS%}/g, product.nutrients);
+    output = output.replace(/{%FROM%}/g, product.from);
+    output = output.replace(/{%DESCRIPTION%}/g, product.description)
+    output = output.replace(/{%IMAGE%}/g, product.image);
+    output = output.replace(/{%ID%}/g, product.id)
+
+    if (!product.organic) {
+        output = output.replace(/{%NOT_ORGANIC%}/g, 'not-organic')
+    }
+
+    return output;
+}
+
 const server = http.createServer((req, res) => {
 
     const pathName = req.url;
 
+    // overview page
     if (pathName === '/' || pathName === '/overview') {
-        res.end('This is OVERVIEW!')
+        /// we specify the content type since we are sending a html here
+        res.writeHead(200, {
+            'Content-type': 'text/html'
+        })
+
+        // here we map over the data in data.json file and for each object in the array we use the replaceTemplate function that replaces all the placeholder in the templateCard with the actual data from dta.json
+        // we use the join method at the end to convert the array of elements returned by map method into a string.
+        const cardHTML = dataObj.map(el => replaceTemplate(templateCard, el)).join();
+
+        // then we replace the placeholder for cards in the overview template with the string we got in cardHTML
+        const output = templateOverview.replace('{%PRODUCT_CARDS%}', cardHTML);
+
+        res.end(output);
+
+        // product page
     } else if (pathName === '/product') {
         res.end('This is PRODUCT!')
+
+        // api page
     } else if (pathName === '/api') {
         // we specify the content type to be application/json since we are sending json data
         res.writeHead(200, {
-            'Content-Type': 'application/json',
+            'Content-type': 'application/json',
         })
         res.end(data);
+
+        // page not found
     } else {
         // first paramter - status code
         // second parameter - headers object. header is the information about the response that we send back to the browser
