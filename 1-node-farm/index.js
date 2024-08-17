@@ -1,5 +1,6 @@
 const fs = require('fs');
 const http = require('http');
+const path = require('path');
 const url = require('url');
 
 //<------------------------------------- FILE READING AND WRITING --------------------------------->//
@@ -67,12 +68,15 @@ const replaceTemplate = (template, product) => {
     return output;
 }
 
+// everytime we make a request, this createServer function is executed
 const server = http.createServer((req, res) => {
 
-    const pathName = req.url;
+    // url.parse returns the information about the url in the form of an object
+    // pathname is the path of the url and query is the query is a object that returns the query info
+    const { query, pathname } = url.parse(req.url, true);
 
     // overview page
-    if (pathName === '/' || pathName === '/overview') {
+    if (pathname === '/' || pathname === '/overview') {
         /// we specify the content type since we are sending a html here
         res.writeHead(200, {
             'Content-type': 'text/html'
@@ -88,11 +92,20 @@ const server = http.createServer((req, res) => {
         res.end(output);
 
         // product page
-    } else if (pathName === '/product') {
-        res.end('This is PRODUCT!')
+    } else if (pathname === '/product') {
+        res.writeHead(200, {
+            'Content-type': 'text/html'
+        });
+
+        // it returns the object with the id in the query paramter from the dataObj
+        const product = dataObj[query.id];
+
+        // then we replace all the placeholder with the from template-product.html with the actual data
+        const output = replaceTemplate(templateProduct, product);
+        res.end(output)
 
         // api page
-    } else if (pathName === '/api') {
+    } else if (pathname === '/api') {
         // we specify the content type to be application/json since we are sending json data
         res.writeHead(200, {
             'Content-type': 'application/json',
