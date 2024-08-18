@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Details - Looking for Alaska</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .book-details {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            width: 600px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            text-align: left;
+        }
+
+        .book-details h1 {
+            margin-top: 0;
+        }
+
+        .book-details .field {
+            margin-bottom: 15px;
+        }
+
+        .book-details .field label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .book-details .field p {
+            margin: 0;
+        }
+
+        .book-details .description {
+            font-style: italic;
+        }
+
+        .back-button {
+            margin-top: 20px;
+        }
+
+        .back-button a {
+            text-decoration: none;
+            background-color: rgb(14, 146, 14);
+            color: #fff;
+            padding: 10px 20px;
+            transition: all 0.2s ease;
+        }
+
+        .back-button a:hover {
+            background-color: rgb(6, 95, 6);
+        }
+
+        .text-gray {
+            color: #333333;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="book-details">
+        <h1 class="text-gray">Looking for Alaska</h1>
+        <div class="field">
+            <label for="authorName" class="text-gray">Author:</label>
+            <p id="authorName">John Green</p>
+        </div>
+        <div class="field">
+            <label for="genre" class="text-gray">Genre:</label>
+            <p id="genre">Young Adult, Fiction</p>
+        </div>
+        <div class="field">
+            <label for="publicationDate" class="text-gray">Publication Date:</label>
+            <p id="publicationDate">March 3, 2005</p>
+        </div>
+        <div class="field">
+            <label for="description" class="text-gray">Description:</label>
+            <p id="description" class="description">
+                Miles Halter, a teenager obsessed with famous last words, leaves his safe and uninteresting life in
+                Florida to attend Culver Creek Preparatory School in Alabama. There, he meets Alaska Young, a beautiful,
+                enigmatic, and self-destructive girl who pulls him into her labyrinth of emotions. As Miles, nicknamed
+                Pudge, forms deep friendships, he is drawn to Alaska’s rebellious spirit and troubled past. The novel
+                explores the complexities of adolescence, from the thrill of first love to the pain of loss. After a
+                tragic accident, Miles and his friends are left to piece together Alaska's life and confront the
+                profound questions she left behind. 'Looking for Alaska' is a poignant exploration of life, death, and
+                the impact one person can have on another, capturing the turbulence of growing up and the search for
+                meaning in a seemingly chaotic world.
+            </p>
+        </div>
+        <div class="back-button">
+            <a href="#">Back</a>
+        </div>
+    </div>
+
+</body>
+
+</html>
