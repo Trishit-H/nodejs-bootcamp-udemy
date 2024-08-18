@@ -38,5 +38,13 @@
         "description": "'Never Let Me Go' by Kazuo Ishiguro is a haunting and deeply moving novel set in a dystopian world where human clones are created for the sole purpose of donating their organs. The story follows Kathy H., a clone who reflects on her childhood at Hailsham, an idyllic but isolated boarding school. There, she and her friends, Tommy and Ruth, slowly come to realize their fate. As they grow up, the harsh reality of their existence becomes apparent, but they continue to grapple with love, loss, and the meaning of their short lives. Ishiguro masterfully explores themes of humanity, memory, and the ethics of scientific advancement. The novel challenges readers to consider what it means to live a meaningful life and questions the moral implications of a society that sacrifices individuals for the greater good. 'Never Let Me Go' is a poignant meditation on the value of life and the inevitable march toward death.",
         "genre": "Dystopian, Science Fiction",
         "publicationDate": "2005-04-05"
+    },
+    {
+    "id": 6,
+    "bookName": "Angels and Demons",
+    "authorName": "Dan Brown",
+    "description": "Angels and Demons is a gripping thriller by Dan Brown that combines history, science, and religion into a fast-paced narrative. The story follows Robert Langdon, a Harvard symbologist, as he is summoned to investigate the murder of a physicist. As Langdon delves deeper, he uncovers a secret society, the Illuminati, and a plot to destroy the Vatican using a stolen antimatter bomb. The novel takes readers on a high-stakes chase through historical and modern-day Rome, filled with cryptic symbols, complex puzzles, and shocking twists. Brown’s meticulous research and intricate storytelling make Angels and Demons a thrilling exploration of faith and science, and the conflict between them.",
+    "genre": "Thriller/Mystery",
+    "publicationDate": "2000-05-01"
     }
 ]
