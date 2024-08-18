@@ -3,10 +3,12 @@ const http = require('http');
 const path = require('path');
 const url = require('url');
 
-// we use slugify to create slugs.
-// slug is a basically the last part of the url that contains a unique string that identifies the resource that the website is displaying
-// eg: in our node-farm project instead of 127.0.0.1:8000/product?id=0 we could have 127.0.0.1:8000/fresh-avocados
-// so here 'fresh-avocados' is the slug
+// We use slugify to create slugs.
+// A slug is the last part of a URL that typically contains a human-readable, unique string 
+// identifying the resource that the website is displaying.
+// For example, in our Node Farm project, instead of using a URL like 127.0.0.1:8000/product?id=0,
+// we could use 127.0.0.1:8000/fresh-avocados.
+// In this case, 'fresh-avocados' is the slug.
 const slugify = require('slugify');
 
 const replaceTemplate = require('./modules/replaceTemplate');
