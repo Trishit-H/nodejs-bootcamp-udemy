@@ -1,0 +1,42 @@
+[
+    {
+        "id": 1,
+        "bookName": "Looking for Alaska",
+        "authorName": "John Green",
+        "description": "Miles Halter, a teenager obsessed with famous last words, leaves his safe and uninteresting life in Florida to attend Culver Creek Preparatory School in Alabama. There, he meets Alaska Young, a beautiful, enigmatic, and self-destructive girl who pulls him into her labyrinth of emotions. As Miles, nicknamed Pudge, forms deep friendships, he is drawn to Alaska’s rebellious spirit and troubled past. The novel explores the complexities of adolescence, from the thrill of first love to the pain of loss. After a tragic accident, Miles and his friends are left to piece together Alaska's life and confront the profound questions she left behind. 'Looking for Alaska' is a poignant exploration of life, death, and the impact one person can have on another, capturing the turbulence of growing up and the search for meaning in a seemingly chaotic world.",
+        "genre": "Young Adult, Fiction",
+        "publicationDate": "2005-03-03"
+    },
+    {
+        "id": 2,
+        "bookName": "Animal Farm",
+        "authorName": "George Orwell",
+        "description": "In George Orwell's 'Animal Farm,' a group of farm animals led by two pigs, Snowball and Napoleon, revolt against their oppressive human owner, Mr. Jones, in hopes of establishing an egalitarian society. However, as the pigs gain power, the initial ideals of equality and freedom are corrupted. Napoleon seizes control, expelling Snowball, and gradually becomes a dictator. The farm's new government mirrors the rise of Stalinism in the Soviet Union, as the pigs begin to resemble the very humans they overthrew. Orwell’s novella is a sharp and insightful political allegory, exposing the dangers of totalitarianism and the betrayal of revolutionary ideals. Through the fate of the farm, Orwell illustrates how power can corrupt, and how those in power often manipulate language and truth to maintain control. 'Animal Farm' remains a powerful commentary on the cyclical nature of tyranny and the fragility of freedom.",
+        "genre": "Political Satire, Allegory",
+        "publicationDate": "1945-08-17"
+    },
+    {
+        "id": 3,
+        "bookName": "The Great Gatsby",
+        "authorName": "F. Scott Fitzgerald",
+        "description": "F. Scott Fitzgerald’s 'The Great Gatsby' is a vivid portrayal of the Jazz Age, a time of excess, glamour, and moral decay in 1920s America. The novel follows Nick Carraway, a young man from the Midwest, who moves to Long Island and becomes entangled in the life of his wealthy and enigmatic neighbor, Jay Gatsby. Gatsby is obsessed with rekindling his past romance with the now-married Daisy Buchanan, leading him to amass a fortune and throw extravagant parties in hopes of attracting her. Through Nick's eyes, we witness the unraveling of Gatsby's dream and the hollowness of the American Dream itself. The novel explores themes of love, ambition, class, and the relentless passage of time, culminating in a tragic ending that underscores the futility of trying to recapture the past. 'The Great Gatsby' remains a timeless critique of the pursuit of wealth and status at the expense of genuine human connection.",
+        "genre": "Tragedy, Fiction",
+        "publicationDate": "1925-04-10"
+    },
+    {
+        "id": 4,
+        "bookName": "The Catcher in the Rye",
+        "authorName": "J.D. Salinger",
+        "description": "J.D. Salinger's 'The Catcher in the Rye' is a seminal novel that captures the voice of a disaffected youth in post-World War II America. The story is narrated by Holden Caulfield, a 16-year-old who has just been expelled from his prestigious prep school. Disillusioned with the world around him, Holden embarks on a journey through New York City, where he grapples with the phoniness of adults, his deep sense of alienation, and the struggles of growing up. Throughout his journey, Holden dreams of becoming 'the catcher in the rye,' a protector of childhood innocence. His encounters with various characters reveal his deep-seated fear of change and the loss of innocence. The novel explores complex themes of identity, belonging, and the painful transition from adolescence to adulthood. Salinger's work resonates with readers for its honest portrayal of teenage angst and its critique of a society that often forces conformity over individuality.",
+        "genre": "Young Adult, Fiction",
+        "publicationDate": "1951-07-16"
+    },
+    {
+        "id": 5,
+        "bookName": "Never Let Me Go",
+        "authorName": "Kazuo Ishiguro",
+        "description": "'Never Let Me Go' by Kazuo Ishiguro is a haunting and deeply moving novel set in a dystopian world where human clones are created for the sole purpose of donating their organs. The story follows Kathy H., a clone who reflects on her childhood at Hailsham, an idyllic but isolated boarding school. There, she and her friends, Tommy and Ruth, slowly come to realize their fate. As they grow up, the harsh reality of their existence becomes apparent, but they continue to grapple with love, loss, and the meaning of their short lives. Ishiguro masterfully explores themes of humanity, memory, and the ethics of scientific advancement. The novel challenges readers to consider what it means to live a meaningful life and questions the moral implications of a society that sacrifices individuals for the greater good. 'Never Let Me Go' is a poignant meditation on the value of life and the inevitable march toward death.",
+        "genre": "Dystopian, Science Fiction",
+        "publicationDate": "2005-04-05"
+    }
+]
