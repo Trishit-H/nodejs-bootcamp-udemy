@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 40px;
+            margin-bottom: 40px;
+            color: #3b3b3b;
+        }
+
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        figure {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .book-name {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            color: #444444;
+        }
+
+        .author-name {
+            color: #555;
+            margin-bottom: 15px;
+        }
+
+        a {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        a:hover {
+            background-color: #45a049;
+        }
+
+        @media (max-width: 600px) {
+            .card-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Book List</h1>
+
+    <div class="card-container">
+        <figure>
+            <figcaption>
+                <div class="book-name">Looking for Alaska</div>
+                <div class="author-name">John Green</div>
+                <a href="#">Details</a>
+            </figcaption>
+        </figure>
+
+        <figure>
+            <figcaption>
+                <div class="book-name">Animal Farm</div>
+                <div class="author-name">George Orwell</div>
+                <a href="#">Details</a>
+            </figcaption>
+        </figure>
+
+        <figure>
+            <figcaption>
+                <div class="book-name">The Great Gatsby</div>
+                <div class="author-name">F. Scott Fitzgerald</div>
+                <a href="#">Details</a>
+            </figcaption>
+        </figure>
+
+        <figure>
+            <figcaption>
+                <div class="book-name">The Catcher in the Rye</div>
+                <div class="author-name">J.D. Salinger</div>
+                <a href="#">Details</a>
+            </figcaption>
+        </figure>
+
+        <figure>
+            <figcaption>
+                <div class="book-name">Never Let Me Go</div>
+                <div class="author-name">Kazuo Ishiguro</div>
+                <a href="#">Details</a>
+            </figcaption>
+        </figure>
+    </div>
+
+</body>
+
+</html>
