@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Book Details - Looking for Alaska</title>
+    <title>Book Details - {%BOOK_NAME%}</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -74,31 +74,23 @@
 <body>
 
     <div class="book-details">
-        <h1 class="text-gray">Looking for Alaska</h1>
+        <h1 class="text-gray">{%BOOK_NAME%}</h1>
         <div class="field">
             <label for="authorName" class="text-gray">Author:</label>
-            <p id="authorName">John Green</p>
+            <p id="authorName">{%AUTHOR_NAME%}</p>
         </div>
         <div class="field">
             <label for="genre" class="text-gray">Genre:</label>
-            <p id="genre">Young Adult, Fiction</p>
+            <p id="genre">{%%GENRE}</p>
         </div>
         <div class="field">
             <label for="publicationDate" class="text-gray">Publication Date:</label>
-            <p id="publicationDate">March 3, 2005</p>
+            <p id="publicationDate">{%PUBLICATION_DATE%}</p>
         </div>
         <div class="field">
             <label for="description" class="text-gray">Description:</label>
             <p id="description" class="description">
-                Miles Halter, a teenager obsessed with famous last words, leaves his safe and uninteresting life in
-                Florida to attend Culver Creek Preparatory School in Alabama. There, he meets Alaska Young, a beautiful,
-                enigmatic, and self-destructive girl who pulls him into her labyrinth of emotions. As Miles, nicknamed
-                Pudge, forms deep friendships, he is drawn to Alaska’s rebellious spirit and troubled past. The novel
-                explores the complexities of adolescence, from the thrill of first love to the pain of loss. After a
-                tragic accident, Miles and his friends are left to piece together Alaska's life and confront the
-                profound questions she left behind. 'Looking for Alaska' is a poignant exploration of life, death, and
-                the impact one person can have on another, capturing the turbulence of growing up and the search for
-                meaning in a seemingly chaotic world.
+                {%DESCRIPTION%}
             </p>
         </div>
         <div class="back-button">
