@@ -44,12 +44,18 @@ const replaceTemplate = require('./modules/replaceTemplate');
 // we only read it once and store it in a variable and send the data
 // also we change the readFile to readFileSync because we only read it once
 
-// here __dirname means the directory the file is located at
-// whereas ./ means the current directory from where we are executing our script
-// so if we were to write './dev-tools/data.json' and the run the index.js file from the desktop, then . here would mean desktop and the not directory the index.js is inside
-// so it's best practice to use __dirname instead of ./
-// EXCEPTION - when using the require() function to import our own modules. in that case the . means the current directry and not the directory from where the script is being executed
-const data = fs.readFileSync(`${__dirname}/dev-data/data.json`, 'utf-8')
+// In Node.js, `__dirname` refers to the directory where the current script is located,
+// regardless of where we execute the script. 
+// In contrast, `./` refers to the current working directory from which we are running the script.
+// So, if we use './dev-tools/data.json' and run the script from a different directory (like the desktop), 
+// `.` would refer to the desktop, not the directory where the script is located.
+// Therefore, it's a best practice to use `__dirname` for file paths to ensure the path is relative 
+// to the script's location.
+// 
+// EXCEPTION: When using `require()` to import our own modules, `./` refers to the directory relative 
+// to the script in which the `require()` statement appears, not the working directory from which 
+// the script is executed.
+const data = fs.readFileSync(`${__dirname}/dev-data/data.json`, "utf-8")
 // this method converts JSON string to a JavaScript object
 const dataObj = JSON.parse(data);
 
@@ -115,11 +121,11 @@ const server = http.createServer((req, res) => {
             'Content-type': 'text/html', // this means the browser is expecting some html as response
             'my-own-header': 'this-is-a-made-up-header' // we can also make our own header and send it
         })
-        res.end('<h1>Page not found!</h1>')
+        res.end("<h1>Page not found!</h1>")
     }
 });
 
 // first parameter - PORT number, second parameter - address of localhost. This is optional.
 server.listen(8000, '127.0.0.1', () => {
-    console.log('Listening to requests on port 8000!');
-})
+    console.log("Listening to requests on port 8000!");
+});
