@@ -68,7 +68,7 @@ const templateProduct = fs.readFileSync(`${__dirname}/templates/template-product
 const slugs = dataObj.map(el => slugify(el.productName, { lower: true }))
 console.log(slugs);
 
-// everytime we make a request, this createServer function is executed
+// everytime we make a request, this callback function in createServer method is executed
 const server = http.createServer((req, res) => {
 
     // url.parse returns the information about the url in the form of an object
