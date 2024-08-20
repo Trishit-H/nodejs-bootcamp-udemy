@@ -30,7 +30,7 @@ In case of callback functions being present in any phase, the event loop will fi
 Order of phase: Timer phase > Poll phase > Check phase > Close phase
 
 In our code: The event loop first enters the Timer phase and checks for any callback functions. Since the delay here is 0ms, the event loop finds a callback function in the callback queue of Timer phase. It executes the callack function and 'a'is printed to the console and then it moves to the next phase, which is the Poll phase.
-The file reading here is offloaded to the system's OS kernel or threal poll. The file we are reading here is very large so it takes a some time to finish reading this file. When the event loop enters the Poll phase, it sees that there are no callback functions. Because I/O (file reading) task is not completed yet. So it will either wait or it will check if there any callback functions of setImmediate is present to be executed. If there is any, it moves to the Check phase and executes those.
+The file reading here is offloaded to the system's OS. The file we are reading here is very large so it takes a some time to finish reading this file. When the event loop enters the Poll phase, it sees that there are no callback functions. Because I/O (file reading) task is not completed yet. So it will either wait or it will check if there any callback functions of setImmediate is present to be executed. If there is any, it moves to the Check phase and executes those.
 
 In our case there is one callback function in Check phase so it is executed and 'c' is printed to the console. 
 Then callback moves to Close phase. Since there is no event to close here, nothing happens.
@@ -72,7 +72,7 @@ Order of phase: Timer phase > Poll phase > Check phase > Close phase
 
 In our code: The event loop first enters the Timer phase and checks for any callback functions. Since the delay here is 2000ms, the event loop finds no callback function in the callback queue of Timer phase. It moves on to the next phase, which is the Poll phase.
 
-The file reading here is offloaded to the system's OS kernel or threal poll. The file we are reading here is very large so it takes a some time to finish reading this file. When the event loop enters the Poll phase, it sees that there are no callback functions. Because I/O (file reading) task is not completed yet. So it will either wait or it will check if there any callback functions of setImmediate is present to be executed. If there is any, it moves to the Check phase and executes those.
+The file reading here is offloaded to the system's OS. The file we are reading here is very large so it takes a some time to finish reading this file. When the event loop enters the Poll phase, it sees that there are no callback functions. Because I/O (file reading) task is not completed yet. So it will either wait or it will check if there any callback functions of setImmediate is present to be executed. If there is any, it moves to the Check phase and executes those.
 
 In our case there is one callback function in Check phase so it is executed and 'c' is printed to the console. 
 Then callback moves to Close phase. Since there is no event to close here, nothing happens.
