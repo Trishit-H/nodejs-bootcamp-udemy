@@ -1,6 +1,6 @@
 const EventEmitter = require('events');
 
-const myEmitter = new EventEmitter();
+// const myEmitter = new EventEmitter();
 
 /*
 myEmitter.on('newSale', () => {
@@ -51,3 +51,34 @@ myEmitter.emit('newSale', 9);
 */
 
 //------------------------------------------------------------------------------------------------------------//
+
+/*
+I real life scenarios, if we were use this pattern in real life then it's best practice to create a new class that will actually inherit from the node EventEmitter
+*/
+
+// Here the Sales class inherits everything from the EventEmitter class that we imported
+class Sales extends EventEmitter {
+    // Each class gets a constructor, which is a function that runs as soon as we create a new object from a class
+    constructor() {
+        // We have to class super everytime we extend from a super class. Sales is the parent class and EventEmitter is the super class
+        // And by running super we get access to all the methods in the super class
+        super();
+    }
+}
+
+// now we create an instance of the Sales class that has all the methods of EventEmitter class
+const myEmitter = new Sales();
+
+myEmitter.on('newSale', () => {
+    console.log('There was a new sale!')
+});
+
+myEmitter.on('newSale', () => {
+    console.log('Customer name: John Doe')
+});
+
+myEmitter.on('newSale', stock => {
+    console.log(`There are now ${stock} items left in the stock!`)
+})
+
+myEmitter.emit('newSale', 9);
