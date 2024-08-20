@@ -58,3 +58,19 @@ server.listen(8000, '127.0.0.1', () => {
 */
 
 // but there is a problem with this solution. our readable stream, the one that we are using to read the file from the disk is much much faster than sending the result with the response writeable stream over the network. and this will overwhelm the response stream, which cannot handle all these incoming data so fast. and this problem is called backpressure. So in this case, backpressure happens when the response cannot send the data nearly as fast as it is recieving it from the file.
+
+
+// Third solution - using pipe function. it allows us to pipe the output of a readable stream right into the input of the writeable stream. it will then fix the problem of backpressure because it will automatically handle the speed of the data coming in, and the speed of the data going out.
+
+const server = http.createServer();
+
+server.on('request', (req, res) => {
+    const readable = fs.createReadStream('test-file.txt');
+
+    // now we have to use the pipe method on the readable stream and put a writeable stream on it
+    readable.pipe(res);  // readableSource.pipe(writeableDestination)
+});
+
+server.listen(8000, '127.0.0.1', () => {
+    console.log('Waiting for requests...');
+});
