@@ -25,4 +25,29 @@ How it works?
 7. And we can set up multiple listeners for one event.
 8. So here we set up two event listeners for the 'newSale' event, where the callback functions simply logs something to the console.
 9. So when we run the code and our execution goes to line number 13, an event named 'mySale' is emitted. And the event listeners pick it up and fires up the callback functions attached to them.
-*/ 
+*/
+
+//------------------------------------------------------------------------------------------------------------//
+
+/*
+We can pass parameters to the event listeners by passing them as additional arguments to the event emitters
+*/
+
+/*
+myEmitter.on('newSale', () => {
+    console.log('There was a new sale!')
+});
+
+myEmitter.on('newSale', () => {
+    console.log('Customer name: John Doe')
+});
+
+// the stock parameter in this listener callback will pick up the agrument when the emit method emits newSale event with the argument(9)
+myEmitter.on('newSale', stock => {
+    console.log(`There are now ${stock} items left in the stock!`)
+})
+
+myEmitter.emit('newSale', 9);
+*/
+
+//------------------------------------------------------------------------------------------------------------//
