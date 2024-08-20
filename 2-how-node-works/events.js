@@ -1,4 +1,5 @@
 const EventEmitter = require('events');
+const http = require('http');
 
 // const myEmitter = new EventEmitter();
 
@@ -53,9 +54,10 @@ myEmitter.emit('newSale', 9);
 //------------------------------------------------------------------------------------------------------------//
 
 /*
-I real life scenarios, if we were use this pattern in real life then it's best practice to create a new class that will actually inherit from the node EventEmitter
+In real life scenarios, if we were use this pattern in real life then it's best practice to create a new class that will actually inherit from the node EventEmitter
 */
 
+/*
 // Here the Sales class inherits everything from the EventEmitter class that we imported
 class Sales extends EventEmitter {
     // Each class gets a constructor, which is a function that runs as soon as we create a new object from a class
@@ -82,3 +84,25 @@ myEmitter.on('newSale', stock => {
 })
 
 myEmitter.emit('newSale', 9);
+*/
+
+//-----------------------------------------------------------------------------------------------------------//
+
+const server = http.createServer();
+
+server.on('request', (req, res) => {
+    console.log('Request recieved!');
+    res.end('Request recieved!')
+});
+
+server.on('request', (req, res) => {
+    console.log('Another request recieved!😁');
+});
+
+server.on('close', (req, res) => {
+    console.log('Server closed!')
+});
+
+server.listen(8000, '127.0.0.1', () => {
+    console.log('Server running at port 8000!')
+});
