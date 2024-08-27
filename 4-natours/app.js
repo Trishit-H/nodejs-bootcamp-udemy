@@ -15,8 +15,10 @@ const PORT = 3000;
 //   res.send('You can post to this url');
 // });
 
+// reading mock data
 const tours = JSON.parse(fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`));
 
+// GET route to get all the tours
 app.get('/api/v1/tours', (req, res) => {
   res.status(200).json({
     status: 'success',
