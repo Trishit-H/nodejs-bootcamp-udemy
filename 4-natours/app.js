@@ -80,6 +80,44 @@ app.post('/api/v1/tours', (req, res) => {
   });
 });
 
+// PATCH route to update a tour
+// we are not writing the logic for this one
+app.patch('/api/v1/tours/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+
+  if (id > tours.length - 1) {
+    return res.status(404).json({
+      status: 'fail',
+      message: 'Invalid ID',
+    });
+  }
+
+  res.status(200).json({
+    status: 'sucsess',
+    data: {
+      tour: '<Updated tour here...>',
+    },
+  });
+});
+
+// DELETE route to update a tour
+// we are not writing the logic for this one
+app.delete('/api/v1/tours/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+
+  if (id > tours.length - 1) {
+    return res.status(404).json({
+      status: 'fail',
+      message: 'Invalid ID',
+    });
+  }
+
+  res.status(204).json({
+    status: 'sucsess',
+    data: null,
+  });
+});
+
 // starting the server
 app.listen(PORT, () => {
   console.log(`App running on PORT ${PORT}`);
