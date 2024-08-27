@@ -32,6 +32,31 @@ app.get('/api/v1/tours', (req, res) => {
   });
 });
 
+// GET route to get one specific tour through params
+app.get('/api/v1/tours/:id', (req, res) => {
+  // converting the id to Number type because everything is stored as string in req.params
+  const id = parseInt(req.params.id);
+
+  // using find method to access the object whose id matches with the one in the params
+  // if no object found, then find returns undefined
+  const tour = tours.find((element) => element.id === id);
+
+  // checking if the tour exists or not
+  if (!tour) {
+    return res.status(404).json({
+      status: 'fail',
+      message: 'Invalid ID',
+    });
+  }
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      tour,
+    },
+  });
+});
+
 // POST route to create a new tour
 app.post('/api/v1/tours', (req, res) => {
   // creating id for each new post
