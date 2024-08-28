@@ -7,6 +7,19 @@ const app = express();
 // middleware
 app.use(express.json());
 
+// custom middlewares
+// this middleware just logs a text to the console anytime a route is hit
+app.use((req, res, next) => {
+  console.log('Hello from the middleware!');
+  next();
+});
+
+// this custom middleware creates a requestTime property on the req object which stores the time at which the request hit the server
+app.use((req, res, next) => {
+  req.requestTime = new Date().toISOString();
+  next();
+});
+
 const PORT = 3000;
 
 // reading mock data
@@ -15,8 +28,10 @@ const tours = JSON.parse(fs.readFileSync(`${__dirname}/dev-data/data/tours-simpl
 // Route handler functions
 // function to get all tours
 const getAllTours = (req, res) => {
+  console.log(req.requestTime);
   res.status(200).json({
     status: 'success',
+    requestedAt: req.requestTime,
     results: tours.length,
     data: {
       tours,
