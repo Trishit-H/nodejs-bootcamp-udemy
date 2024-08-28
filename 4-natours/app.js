@@ -9,20 +9,12 @@ app.use(express.json());
 
 const PORT = 3000;
 
-// //routes
-// app.get('/', (req, res) => {
-//   res.status(200).json({ message: 'Hello from the server....', app: 'natorus' });
-// });
-
-// app.post('/', (req, res) => {
-//   res.send('You can post to this url');
-// });
-
 // reading mock data
 const tours = JSON.parse(fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`));
 
-// GET route to get all the tours
-app.get('/api/v1/tours', (req, res) => {
+// Route handler functions
+// function to get all tours
+const getAllTours = (req, res) => {
   res.status(200).json({
     status: 'success',
     results: tours.length,
@@ -30,10 +22,10 @@ app.get('/api/v1/tours', (req, res) => {
       tours,
     },
   });
-});
+};
 
-// GET route to get one specific tour through params
-app.get('/api/v1/tours/:id', (req, res) => {
+// function to get one tour by params
+const getTour = (req, res) => {
   // converting the id to Number type because everything is stored as string in req.params
   const id = parseInt(req.params.id);
 
@@ -55,10 +47,10 @@ app.get('/api/v1/tours/:id', (req, res) => {
       tour,
     },
   });
-});
+};
 
-// POST route to create a new tour
-app.post('/api/v1/tours', (req, res) => {
+// function to create a new tour
+const createTour = (req, res) => {
   // creating id for each new post
   const newId = tours[tours.length - 1].id + 1;
 
@@ -78,11 +70,11 @@ app.post('/api/v1/tours', (req, res) => {
       },
     });
   });
-});
+};
 
-// PATCH route to update a tour
+// function to update a tour
 // we are not writing the logic for this one
-app.patch('/api/v1/tours/:id', (req, res) => {
+const updateTour = (req, res) => {
   const id = parseInt(req.params.id);
 
   if (id > tours.length - 1) {
@@ -98,11 +90,11 @@ app.patch('/api/v1/tours/:id', (req, res) => {
       tour: '<Updated tour here...>',
     },
   });
-});
+};
 
-// DELETE route to update a tour
+// function to delete a tour
 // we are not writing the logic for this one
-app.delete('/api/v1/tours/:id', (req, res) => {
+const deleteTour = (req, res) => {
   const id = parseInt(req.params.id);
 
   if (id > tours.length - 1) {
@@ -116,7 +108,35 @@ app.delete('/api/v1/tours/:id', (req, res) => {
     status: 'sucsess',
     data: null,
   });
-});
+};
+
+// GET route to get all the tours
+// app.get('/api/v1/tours', getAllTours);
+
+// GET route to get one specific tour through params
+// app.get('/api/v1/tours/:id', getTour);
+
+// POST route to create a new tour
+// app.post('/api/v1/tours', createTour);
+
+// PATCH route to update a tour
+// app.patch('/api/v1/tours/:id', updateTour);
+
+// DELETE route to update a tour
+// app.delete('/api/v1/tours/:id',deleteTour);
+
+// prettier-ignore
+app
+  .route('/api/v1/tours')
+  .get(getAllTours)
+  .post(createTour);
+
+// prettier-ignore
+app
+  .route('/api/v1/tours/:id')
+  .get(getTour)
+  .patch(updateTour)
+  .delete(deleteTour);
 
 // starting the server
 app.listen(PORT, () => {
