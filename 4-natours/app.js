@@ -1,10 +1,12 @@
 const fs = require('fs');
 const express = require('express');
+const morgan = require('morgan');
 
 // adds various methods of express
 const app = express();
 
-// middleware
+// middlewares
+app.use(morgan('dev'));
 app.use(express.json());
 
 // custom middlewares
