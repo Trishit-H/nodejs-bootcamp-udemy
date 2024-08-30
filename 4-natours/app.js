@@ -127,21 +127,47 @@ const deleteTour = (req, res) => {
   });
 };
 
-// GET route to get all the tours
-// app.get('/api/v1/tours', getAllTours);
+// function to get all users
+const getAllUsers = (req, res) => {
+  res.status(500).json({
+    status: 'error',
+    message: 'This route is not defined yet...',
+  });
+};
 
-// GET route to get one specific tour through params
-// app.get('/api/v1/tours/:id', getTour);
+// function to get one user
+const getUser = (req, res) => {
+  res.status(500).json({
+    status: 'error',
+    message: 'This route is not defined yet...',
+  });
+};
 
-// POST route to create a new tour
-// app.post('/api/v1/tours', createTour);
+// function to create user
+const createUser = (req, res) => {
+  res.status(500).json({
+    status: 'error',
+    message: 'This route is not defined yet...',
+  });
+};
 
-// PATCH route to update a tour
-// app.patch('/api/v1/tours/:id', updateTour);
+// function to update user
+const updateUser = (req, res) => {
+  res.status(500).json({
+    status: 'error',
+    message: 'This route is not defined yet...',
+  });
+};
 
-// DELETE route to update a tour
-// app.delete('/api/v1/tours/:id',deleteTour);
+// function to delete user
+const deleteUser = (req, res) => {
+  res.status(500).json({
+    status: 'error',
+    message: 'This route is not defined yet...',
+  });
+};
 
+// Route for tours
 // prettier-ignore
 app
   .route('/api/v1/tours')
@@ -154,6 +180,18 @@ app
   .get(getTour)
   .patch(updateTour)
   .delete(deleteTour);
+
+// Route for user
+// prettier-ignore
+app.route('/api/v1/users')
+  .get(getAllUsers)
+  .post(createUser);
+
+// prettier-ignore
+app.route('/api/v1/users/:id')
+  .get(getUser)
+  .patch(updateUser)
+  .delete(deleteUser);
 
 // starting the server
 app.listen(PORT, () => {
