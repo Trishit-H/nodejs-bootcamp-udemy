@@ -5,6 +5,22 @@ const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
 );
 
+// callback function for router.param middleware that check whether the id present in the request is valid or not
+const checkId = (req, res, next, val) => {
+  console.log(`Tour id is: ${val}`);
+
+  const id = parseInt(req.params.id);
+
+  if (id > tours.length - 1) {
+    return res.status(404).json({
+      status: 'fail',
+      message: 'Invalid ID',
+    });
+  }
+
+  next();
+};
+
 // function to get all tours
 const getAllTours = (req, res) => {
   console.log(req.requestTime);
@@ -26,14 +42,6 @@ const getTour = (req, res) => {
   // using find method to access the object whose id matches with the one in the params
   // if no object found, then find returns undefined
   const tour = tours.find((element) => element.id === id);
-
-  // checking if the tour exists or not
-  if (!tour) {
-    return res.status(404).json({
-      status: 'fail',
-      message: 'Invalid ID',
-    });
-  }
 
   res.status(200).json({
     status: 'success',
@@ -73,15 +81,6 @@ const createTour = (req, res) => {
 // function to update a tour
 // we are not writing the logic for this one
 const updateTour = (req, res) => {
-  const id = parseInt(req.params.id);
-
-  if (id > tours.length - 1) {
-    return res.status(404).json({
-      status: 'fail',
-      message: 'Invalid ID',
-    });
-  }
-
   res.status(200).json({
     status: 'sucsess',
     data: {
@@ -93,15 +92,6 @@ const updateTour = (req, res) => {
 // function to delete a tour
 // we are not writing the logic for this one
 const deleteTour = (req, res) => {
-  const id = parseInt(req.params.id);
-
-  if (id > tours.length - 1) {
-    return res.status(404).json({
-      status: 'fail',
-      message: 'Invalid ID',
-    });
-  }
-
   res.status(204).json({
     status: 'sucsess',
     data: null,
@@ -115,4 +105,5 @@ module.exports = {
   createTour,
   updateTour,
   deleteTour,
+  checkId,
 };
