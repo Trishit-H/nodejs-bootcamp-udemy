@@ -8,8 +8,14 @@ const userRouter = require('./routes/userRoutes');
 const app = express();
 
 // 1) middlewares
+// to log http request info
 app.use(morgan('dev'));
+
+// parses the incoming json data sent by client and makes it available in req.body
 app.use(express.json());
+
+// for serving static files. here files will be served from public directory
+app.use(express.static(`${__dirname}/public`));
 
 // 2) custom middlewares
 // this middleware just logs a text to the console anytime a route is hit
