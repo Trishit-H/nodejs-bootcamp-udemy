@@ -1,9 +1,7 @@
 const fs = require('fs');
 
 // reading mock data
-const tours = JSON.parse(
-  fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
-);
+const tours = JSON.parse(fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`));
 
 // callback function for router.param middleware that check whether the id present in the request is valid or not
 const checkId = (req, res, next, val) => {
@@ -15,6 +13,20 @@ const checkId = (req, res, next, val) => {
     return res.status(404).json({
       status: 'fail',
       message: 'Invalid ID',
+    });
+  }
+
+  next();
+};
+
+// this middlleware is for checking whether the req.body has name and the price field when creating a new tour
+const checkReqBody = (req, res, next) => {
+  const { name, price } = req.body;
+
+  if (!name || !price) {
+    return res.status(400).json({
+      status: 'fail',
+      message: 'Missing name or price field!',
     });
   }
 
@@ -64,18 +76,21 @@ const createTour = (req, res) => {
   tours.push(newTour);
 
   // persisting this data into the json file
-  fs.writeFile(
-    `${__dirname}/dev-data/data/tours-simple.json`,
-    JSON.stringify(tours),
-    (err) => {
-      res.status(201).json({
-        status: 'success',
-        data: {
-          tour: newTour,
-        },
+  fs.writeFile(`${__dirname}/../dev-data/data/tours-simple.json`, JSON.stringify(tours), (err) => {
+    if (err) {
+      res.status(500).json({
+        status: 'fail',
+        message: err.message,
       });
     }
-  );
+
+    res.status(201).json({
+      status: 'success',
+      data: {
+        tour: newTour,
+      },
+    });
+  });
 };
 
 // function to update a tour
@@ -106,4 +121,5 @@ module.exports = {
   updateTour,
   deleteTour,
   checkId,
+  checkReqBody,
 };
