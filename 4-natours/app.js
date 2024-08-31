@@ -9,7 +9,10 @@ const app = express();
 
 // 1) middlewares
 // to log http request info
-app.use(morgan('dev'));
+// this only run in development mode
+if (process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev'));
+}
 
 // parses the incoming json data sent by client and makes it available in req.body
 app.use(express.json());
