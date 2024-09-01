@@ -1,19 +1,5 @@
 const Tour = require('./../models/tour.model');
 
-// this middlleware is for checking whether the req.body has name and the price field when creating a new tour
-const checkReqBody = (req, res, next) => {
-  const { name, price } = req.body;
-
-  if (!name || !price) {
-    return res.status(400).json({
-      status: 'fail',
-      message: 'Missing name or price field!',
-    });
-  }
-
-  next();
-};
-
 // function to get all tours
 const getAllTours = (req, res) => {
   console.log(req.requestTime);
@@ -45,13 +31,22 @@ const getTour = (req, res) => {
 };
 
 // function to create a new tour
-const createTour = (req, res) => {
-  res.status(201).json({
-    status: 'success',
-    data: {
-      tour: newTour,
-    },
-  });
+const createTour = async (req, res) => {
+  try {
+    const newTour = await Tour.create(req.body);
+
+    res.status(201).json({
+      status: 'success',
+      data: {
+        tour: newTour,
+      },
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: 'fail',
+      message: 'Invalid data sent',
+    });
+  }
 };
 
 // function to update a tour
@@ -82,5 +77,4 @@ module.exports = {
   updateTour,
   deleteTour,
   // checkId,
-  checkReqBody,
 };
