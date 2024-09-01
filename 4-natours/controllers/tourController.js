@@ -1,33 +1,42 @@
 const Tour = require('./../models/tour.model');
 
 // function to get all tours
-const getAllTours = (req, res) => {
-  console.log(req.requestTime);
-  res.status(200).json({
-    status: 'success',
-    requestedAt: req.requestTime,
-    // results: tours.length,
-    // data: {
-    //   tours,
-    // },
-  });
+const getAllTours = async (req, res) => {
+  try {
+    const tours = await Tour.find();
+
+    res.status(200).json({
+      status: 'success',
+      results: tours.length,
+      data: {
+        tours,
+      },
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: 'fail',
+      message: err,
+    });
+  }
 };
 
 // function to get one tour by params
-const getTour = (req, res) => {
-  // converting the id to Number type because everything is stored as string in req.params
-  const id = parseInt(req.params.id);
+const getTour = async (req, res) => {
+  try {
+    const tour = await Tour.findById(req.params.id);
 
-  // using find method to access the object whose id matches with the one in the params
-  // if no object found, then find returns undefined
-  // const tour = tours.find((element) => element.id === id);
-
-  res.status(200).json({
-    status: 'success',
-    // data: {
-    //   tour,
-    // },
-  });
+    res.status(200).json({
+      status: 'success',
+      data: {
+        tour,
+      },
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: 'fail',
+      message: err,
+    });
+  }
 };
 
 // function to create a new tour
