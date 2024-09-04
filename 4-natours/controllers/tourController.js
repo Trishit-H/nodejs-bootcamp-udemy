@@ -3,8 +3,8 @@ const Tour = require('./../models/tour.model');
 // function to get all tours
 const getAllTours = async (req, res) => {
   try {
-    // Build query
-    // 1) filtering
+    // B U I L D    Q U E R Y
+    // 1a) FILTERING
 
     // create a copy of the req.query object
     const queryObject = { ...req.query };
@@ -15,7 +15,7 @@ const getAllTours = async (req, res) => {
     // remove the fields present in excludedFields array from queryObject
     excludedFields.forEach((el) => delete queryObject[el]);
 
-    // 2) advanced filtering
+    // 1b) ADVANCED FILTERING
     // here we replace the operator coming from req.query with mongodb operator
     // operators to replace - gte, gt, lte, lt with $gte, $gt, $lte, $lt
 
@@ -23,10 +23,21 @@ const getAllTours = async (req, res) => {
     let queryString = JSON.stringify(queryObject);
     queryString = queryString.replace(/\b(?:gte|gt|lte|lt)\b/g, (match) => `$${match}`);
 
-    const query = Tour.find(JSON.parse(queryString));
+    // we build our Query object here and store it in the query variable
+    let query = Tour.find(JSON.parse(queryString));
 
-    // 3) execute the query
-    const tours = await query;
+    // 2) SORTING
+    // check if we have a sort query in the query param
+    if (req.query.sort) {
+      // to get a string in the following format "field1 field2..." from "field1,field2..."
+      const sortBy = req.query.sort.split(',').join(' ');
+      query = query.sort(sortBy); // if there is, then chain the sort method and pass in sortBy as the argument
+    } else {
+      query = query.sort('-ratingsAverage'); // if no sort query is given, sort by ratingsAverage field
+    }
+
+    // E X E C U T E   Q U E R Y
+    const tours = await query.exec();
 
     res.status(200).json({
       status: 'success',
