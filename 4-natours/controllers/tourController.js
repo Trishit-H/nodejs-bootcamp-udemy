@@ -23,7 +23,7 @@ const getAllTours = async (req, res) => {
     let queryString = JSON.stringify(queryObject);
     queryString = queryString.replace(/\b(?:gte|gt|lte|lt)\b/g, (match) => `$${match}`);
 
-    // we build our Query object here and store it in the query variable
+    // we build our Query object here, with the filtering query and store it in the query variable
     let query = Tour.find(JSON.parse(queryString));
 
     // 2) SORTING
@@ -34,6 +34,14 @@ const getAllTours = async (req, res) => {
       query = query.sort(sortBy); // if there is, then chain the sort method and pass in sortBy as the argument
     } else {
       query = query.sort('-ratingsAverage'); // if no sort query is given, sort by ratingsAverage field
+    }
+
+    // 3) FIELD LIMITING
+    if (req.query.fields) {
+      const selectFields = req.query.fields.split(',').join(' ');
+      query = query.select(selectFields);
+    } else {
+      query = query.select('-__v -createdAt -updatedAt');
     }
 
     // E X E C U T E   Q U E R Y
