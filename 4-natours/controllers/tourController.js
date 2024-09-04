@@ -2,25 +2,31 @@ const Tour = require('./../models/tour.model');
 
 // function to get all tours
 const getAllTours = async (req, res) => {
-  // create a copy of the req.query object
-  const queryObject = { ...req.query };
-
-  // these are the query params that we don't want to search by
-  const excludedFields = ['page', 'sort', 'limit', 'fields'];
-
-  // remove the fields present in excludedFields array from queryObject
-  excludedFields.forEach((el) => delete queryObject[el]);
-
-  console.log(queryObject, req.query);
-
   try {
-    const tours = await Tour.find(queryObject);
+    // Build query
+    // 1) filtering
 
-    // const tours = await Tour.find()
-    //   .where('duration')
-    //   .equals(5)
-    //   .where('difficulty')
-    //   .equals('easy');
+    // create a copy of the req.query object
+    const queryObject = { ...req.query };
+
+    // these are the query params that we don't want to search by
+    const excludedFields = ['page', 'sort', 'limit', 'fields'];
+
+    // remove the fields present in excludedFields array from queryObject
+    excludedFields.forEach((el) => delete queryObject[el]);
+
+    // 2) advanced filtering
+    // here we replace the operator coming from req.query with mongodb operator
+    // operators to replace - gte, gt, lte, lt with $gte, $gt, $lte, $lt
+
+    // first convert the query object to a string
+    let queryString = JSON.stringify(queryObject);
+    queryString = queryString.replace(/\b(?:gte|gt|lte|lt)\b/g, (match) => `$${match}`);
+
+    const query = Tour.find(JSON.parse(queryString));
+
+    // 3) execute the query
+    const tours = await query;
 
     res.status(200).json({
       status: 'success',
