@@ -6,13 +6,14 @@ const {
   createTour,
   updateTour,
   deleteTour,
-  // checkId,
+  aliasTopTours,
 } = require('../controllers/tourController');
 
 const router = express.Router();
 
-// this middleware is for checking if the param containing the id is valid or not
-// router.param('id', checkId);
+// alias for /api/v1/tours?sort=-ratingsAverage,price&limit=5
+// it returns the top 5 highest rated cheap tours
+router.route('/get-top-5-cheap').get(aliasTopTours, getAllTours);
 
 router.route('/').get(getAllTours).post(createTour);
 router.route('/:id').get(getTour).patch(updateTour).delete(deleteTour);
