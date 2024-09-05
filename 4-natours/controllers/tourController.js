@@ -1,7 +1,13 @@
 const Tour = require('./../models/tour.model');
+const APIFeatures = require('./../utils/apiFeatures');
 
-// middleware for the alias for getting top 5 cheap tours
-// /tours?sort=-ratingsAverage,price&limit=5
+/**
+ * Middleware to set default query parameters for fetching top 5 cheap tours.
+ * This middleware modifies the query parameters in the request to:
+ * - Limit results to 5 tours
+ * - Sort by ratingsAverage (descending) and price (ascending)
+ * - Select specific fields: name, price, ratingsAverage, summary, difficulty
+ */
 const aliasTopTours = (req, res, next) => {
   req.query.limit = '5';
   req.query.sort = '-ratingsAverage,price';
@@ -10,117 +16,23 @@ const aliasTopTours = (req, res, next) => {
 };
 
 /**
- * APIFeatures class is responsible for applying query operations such as filtering, sorting,
- * field limiting, and pagination to a Mongoose query object based on the incoming HTTP request parameters.
- *
- * It enables chaining of methods to refine the query before executing it against the database.
+ * Controller function to get all tours based on query parameters.
+ * - Uses the `APIFeatures` class to apply filtering, field limiting, and pagination.
+ * - Responds with a JSON object containing the list of tours and their count.
  */
-class APIFeatures {
-  constructor(query, queryString) {
-    // The `query` is the Mongoose query object that will be used to interact with the database.
-    // The `queryString` is the HTTP request query parameters (e.g., req.query) received from the client.
-    this.query = query;
-    this.queryString = queryString;
-  }
-
-  filter() {
-    // Create a shallow copy of the query parameters (queryString) from the request.
-    // This ensures we don't modify the original object while manipulating it.
-    const queryObject = { ...this.queryString };
-
-    // Define an array of fields that should be excluded from filtering.
-    // These fields (e.g., `page`, `sort`, `limit`, `fields`) are used for other operations like pagination, sorting, etc.
-    const excludedFields = ['page', 'sort', 'limit', 'fields'];
-
-    // Loop through the `excludedFields` array and delete each of these fields from the `queryObject`.
-    // This prevents them from being used as part of the filtering conditions.
-    excludedFields.forEach((el) => delete queryObject[el]);
-
-    // ADVANCED FILTERING:
-    // Convert the `queryObject` to a string so that we can manipulate it using regular expressions.
-    // We aim to transform query parameters like `gte`, `gt`, `lte`, `lt` into MongoDB operators (`$gte`, `$gt`, `$lte`, `$lt`).
-    let queryStr = JSON.stringify(queryObject);
-
-    // Use a regular expression to find and replace the query operators (gte, gt, lte, lt) with their corresponding MongoDB operators.
-    // For example, `duration[gte]=5` becomes `{ duration: { $gte: 5 } }`.
-    queryStr = queryStr.replace(/\b(?:gte|gt|lte|lt)\b/g, (match) => `$${match}`);
-
-    // Parse the modified query string back into an object and use it to build the Mongoose query.
-    // The `find()` method does not execute the query but returns a Mongoose Query object, allowing for further chaining.
-    this.query = this.query.find(JSON.parse(queryStr));
-
-    // Return `this` to allow for method chaining in the `APIFeatures` class.
-    return this;
-  }
-
-  // Method for sorting the query results based on the fields specified in the request query string.
-  sort() {
-    if (this.queryString.sort) {
-      // If the `sort` parameter is provided in the query string, convert it into a format
-      // that Mongoose can use. The sort fields are separated by commas in the request,
-      // but MongoDB expects space-separated fields.
-      const sortBy = this.queryString.sort.split(',').join(' ');
-
-      // Chain the `sort()` method to the query and pass the formatted sort fields.
-      this.query = this.query.sort(sortBy);
-    } else {
-      // If no sort parameter is provided, the default sorting is by `ratingsAverage` in descending order.
-      this.query = this.query.sort('-ratingsAverage');
-    }
-
-    // Return `this` to enable method chaining in the `APIFeatures` class.
-    return this;
-  }
-
-  // Method for limiting the fields returned in the query results.
-  limitingFields() {
-    if (this.queryString.fields) {
-      // If the `fields` parameter is provided in the query string, convert it into a format
-      // that Mongoose can use. The requested fields are separated by commas in the request,
-      // but MongoDB expects space-separated fields.
-      const selectFields = this.queryString.fields.split(',').join(' ');
-
-      // Chain the `select()` method to the query and pass the formatted fields to be selected.
-      this.query = this.query.select(selectFields);
-    } else {
-      // If no `fields` parameter is provided, exclude certain fields (e.g., `__v`, `createdAt`, `updatedAt`)
-      // from the results by default. The `-` sign indicates exclusion.
-      this.query = this.query.select('-__v -createdAt -updatedAt');
-    }
-
-    // Return `this` to enable method chaining in the `APIFeatures` class.
-    return this;
-  }
-
-  // Method for implementing pagination in the query results.
-  paginate() {
-    // Convert the `page` and `limit` query parameters into numbers, and set default values
-    // if they are not provided. `page` defaults to 1, and `limit` defaults to 100.
-    const page = Number(this.queryString.page) || 1;
-    const limit = Number(this.queryString.limit) || 100;
-
-    // Calculate the number of documents to skip based on the current page.
-    // For example, on page 2 with a limit of 10, you would skip the first 10 results.
-    const skip = (page - 1) * limit;
-
-    // Chain the `skip()` and `limit()` methods to the query to implement pagination.
-    this.query = this.query.skip(skip).limit(limit);
-
-    // Return `this` to enable method chaining in the `APIFeatures` class.
-    return this;
-  }
-}
-
-// function to get all tours
 const getAllTours = async (req, res) => {
   try {
-    // E X E C U T E   Q U E R Y
+    // Create an instance of APIFeatures with the query and request parameters.
     const features = new APIFeatures(Tour.find(), req.query)
-      .filter()
-      .limitingFields()
-      .paginate();
+      .filter() // Apply filtering based on query parameters
+      .sort() // Apply sorting based on query values
+      .limitingFields() // Limit fields to be returned
+      .paginate(); // Implement pagination
+
+    // Execute the query and retrieve the tours
     const tours = await features.query;
 
+    // Respond with a success status and the list of tours
     res.status(200).json({
       status: 'success',
       results: tours.length,
@@ -129,6 +41,7 @@ const getAllTours = async (req, res) => {
       },
     });
   } catch (err) {
+    // Respond with a fail status and error message if an error occurs
     res.status(404).json({
       status: 'fail',
       message: err.message,
@@ -136,11 +49,17 @@ const getAllTours = async (req, res) => {
   }
 };
 
-// function to get one tour by params
+/**
+ * Controller function to get a single tour by its ID.
+ * - Finds the tour by its ID from the request parameters.
+ * - Responds with the tour data if found.
+ */
 const getTour = async (req, res) => {
   try {
+    // Find a single tour by ID
     const tour = await Tour.findById(req.params.id);
 
+    // Respond with the tour data if found
     res.status(200).json({
       status: 'success',
       data: {
@@ -148,6 +67,7 @@ const getTour = async (req, res) => {
       },
     });
   } catch (err) {
+    // Respond with a fail status and error message if an error occurs
     res.status(404).json({
       status: 'fail',
       message: err,
@@ -155,11 +75,17 @@ const getTour = async (req, res) => {
   }
 };
 
-// function to create a new tour
+/**
+ * Controller function to create a new tour.
+ * - Creates a new tour document with the data provided in the request body.
+ * - Responds with the newly created tour data.
+ */
 const createTour = async (req, res) => {
   try {
+    // Create a new tour with the request body data
     const newTour = await Tour.create(req.body);
 
+    // Respond with the created tour data
     res.status(201).json({
       status: 'success',
       data: {
@@ -167,6 +93,7 @@ const createTour = async (req, res) => {
       },
     });
   } catch (err) {
+    // Respond with a fail status and error message if invalid data is sent
     res.status(400).json({
       status: 'fail',
       message: 'Invalid data sent',
@@ -174,14 +101,20 @@ const createTour = async (req, res) => {
   }
 };
 
-// function to update a tour
+/**
+ * Controller function to update an existing tour by its ID.
+ * - Updates the tour with the data provided in the request body.
+ * - Responds with the updated tour data.
+ */
 const updateTour = async (req, res) => {
   try {
+    // Update the tour by ID and return the updated document
     const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
+      new: true, // Return the updated document
+      runValidators: true, // Run validators to ensure data integrity
     });
 
+    // Respond with the updated tour data
     res.status(200).json({
       status: 'success',
       data: {
@@ -189,6 +122,7 @@ const updateTour = async (req, res) => {
       },
     });
   } catch (err) {
+    // Respond with a fail status and error message if an error occurs
     res.status(400).json({
       status: 'fail',
       message: err,
@@ -196,16 +130,23 @@ const updateTour = async (req, res) => {
   }
 };
 
-// function to delete a tour
+/**
+ * Controller function to delete a tour by its ID.
+ * - Deletes the tour document identified by the request parameters.
+ * - Responds with a success status and no data upon successful deletion.
+ */
 const deleteTour = async (req, res) => {
   try {
+    // Delete the tour by ID
     await Tour.findByIdAndDelete(req.params.id);
 
+    // Respond with a success status and no content
     res.status(204).json({
       status: 'success',
       data: null,
     });
   } catch (err) {
+    // Respond with a fail status and error message if an error occurs
     res.status(400).json({
       status: 'fail',
       message: err,
@@ -213,7 +154,7 @@ const deleteTour = async (req, res) => {
   }
 };
 
-// exporting the functions
+// Exporting the controller functions for use in routing
 module.exports = {
   getAllTours,
   getTour,
