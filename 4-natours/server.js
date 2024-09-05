@@ -1,20 +1,26 @@
 /*
-We created this file because it's good practice to have everything related to the server in one file and everything related to express in separate file (app.js)
+ * This file is our main entry point for the application.
+ * It is responsible for setting up the server and connecting to the database.
+ *
+ * The structure follows good practices by separating server-related code (this file)
+ * from Express-related configuration (app.js).
+ */
 
-server.js is our main file, where everything starts
-*/
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 
-// what this does is it loads the content of config.env file to process.env
+// Load environment variables from the config.env file into process.env
+// This allows us to access environment-specific variables (e.g., DB credentials, PORT)
 dotenv.config({ path: './config.env' });
 
 const app = require('./app');
 
-// here we replace <PASSWORD> in the connection string with the actual password
+// Replace <PASSWORD> in the MongoDB connection string with the actual password from the environment variables
+// This creates the final URI used to connect to the MongoDB database
 const DB_URI = process.env.MONGODB_URI.replace('<PASSWORD>', process.env.DB_PASSWORD);
 
-// connecting to database
+// Connect to the MongoDB database using Mongoose
+// If the connection is successful, log a success message; otherwise, catch and log any errors
 mongoose
   .connect(DB_URI)
   .then(() => {
@@ -24,8 +30,11 @@ mongoose
     console.log('Error connecting to database:', err.message);
   });
 
+// Define the port on which the server will run, defaulting to 3000 if not specified in the environment
 const PORT = process.env.PORT || 3000;
 
+// Start the server and listen for incoming requests on the specified port
+// Once the server is up, log a message indicating that the app is running
 app.listen(PORT, () => {
   console.log(`App running on PORT ${PORT}`);
 });

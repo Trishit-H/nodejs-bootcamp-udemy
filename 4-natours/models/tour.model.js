@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 
+// Define the tour schema which will outline the structure of each document in the "tours" collection
+// The schema enforces specific data types and validation rules for each field
 const tourSchema = new mongoose.Schema(
   {
     name: {
@@ -52,6 +54,9 @@ const tourSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Create the Tour model using the defined schema
+// This model represents the "tours" collection in the MongoDB database
 const Tour = mongoose.model('Tour', tourSchema);
 
+// Export the Tour model for use in other parts of the application
 module.exports = Tour;
