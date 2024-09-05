@@ -44,6 +44,23 @@ const getAllTours = async (req, res) => {
       query = query.select('-__v -createdAt -updatedAt');
     }
 
+    // 4) PAGINATION
+    // page=2&limit=10 ---> page 1, 1-10 docs; page 2, 11-20 docs; page 3, 21-30 docs ...
+
+    const page = Number(req.query.page) || 1; // convert the page value to a number and have a default value of 1
+    const limit = Number(req.query.limit) || 100; // convert the limit value to a number and have a default value of 1
+    const skip = (page - 1) * limit;
+
+    query = query.skip(skip).limit(limit);
+
+    // this is to check if we have any more document to show
+    if (req.query.page) {
+      const docCount = await Tour.countDocuments();
+      if (skip >= docCount) {
+        throw new Error("This page doesn't exist");
+      }
+    }
+
     // E X E C U T E   Q U E R Y
     const tours = await query.exec();
 
@@ -57,7 +74,7 @@ const getAllTours = async (req, res) => {
   } catch (err) {
     res.status(404).json({
       status: 'fail',
-      message: err,
+      message: err.message,
     });
   }
 };
