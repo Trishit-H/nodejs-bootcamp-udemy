@@ -6,6 +6,8 @@ const {
   updateTour,
   deleteTour,
   aliasTopTours,
+  getTourStatistics,
+  getMonthlyPlan,
 } = require('../controllers/tourController');
 
 const router = express.Router();
@@ -14,6 +16,10 @@ const router = express.Router();
 // This is an alias for the URL /api/v1/tours?sort=-ratingsAverage,price&limit=5
 // It uses the aliasTopTours middleware to pre-configure the query parameters before calling getAllTours
 router.route('/get-top-5-cheap').get(aliasTopTours, getAllTours);
+
+router.route('/tour-stats').get(getTourStatistics);
+
+router.route('/monthly-plan/:year').get(getMonthlyPlan);
 
 // Routes for handling all tours (GET all tours and POST a new tour)
 router.route('/').get(getAllTours).post(createTour);
