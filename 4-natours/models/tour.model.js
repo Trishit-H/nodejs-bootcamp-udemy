@@ -52,6 +52,10 @@ const tourSchema = new mongoose.Schema(
     },
     images: [String],
     startDates: [Date],
+    secretTour: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     // Schema options:
@@ -91,6 +95,36 @@ tourSchema.pre('save', function (next) {
 // The 'doc' argument refers to the saved document, which can be logged, processed, or used for further actions.
 tourSchema.post('save', function (doc, next) {
   console.log(doc);
+  next();
+});
+
+// QUERY MIDDLEWARE: Middleware functions that execute before queries like find(), findOne(), findOneAndUpdate(), etc.
+// The `this` keyword in this context refers to the Query object that is about to be executed.
+
+// Pre-query middleware to modify queries before execution
+// This middleware will be applied to all queries that start with 'find' (e.g., find, findOne, findOneAndUpdate, etc.)
+// It adds a filter to exclude documents where `secretTour` is true and tracks the start time of the query.
+tourSchema.pre(/^find/, function (next) {
+  // Modify the query to exclude documents where `secretTour` is true
+  this.find({ secretTour: { $ne: true } });
+
+  // Add a custom property to the Query object to track the start time
+  this.start = Date.now();
+
+  next();
+});
+
+// Post-query middleware that executes after the query has been executed
+// This middleware is applied to all queries that start with 'find' (e.g., find, findOne, findOneAndUpdate, etc.)
+// It logs the duration of the query and the documents returned by the query.
+tourSchema.post(/^find/, function (docs, next) {
+  // Access the custom property set in the `pre` middleware
+  // Calculate and log the duration of the query by subtracting the start time from the current time
+  console.log(`Query took ${Date.now() - this.start} milliseconds`);
+
+  // `docs` contains the documents returned by the query
+  console.log(docs);
+
   next();
 });
 
