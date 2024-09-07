@@ -51,8 +51,21 @@ const tourSchema = new mongoose.Schema(
     images: [String],
     startDates: [Date],
   },
-  { timestamps: true }
+  {
+    // Schema options:
+    // timestamps: Automatically adds `createdAt` and `updatedAt` fields to the schema.
+    // toJSON and toObject: Enables the virtual properties (like `durationInWeeks`) to be included when the documents are converted to JSON or plain objects.
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  }
 );
+
+// durationInWeeks - a virtual property that calculates and returns the duration in weeks based on the `duration` field (assumed to be in days).
+// This property won't be stored in the database but can be accessed like a normal field when retrieving documents.
+tourSchema.virtual('durationInWeeks').get(function () {
+  return (this.duration / 7).toFixed(1); // Convert days to weeks and round to one decimal place.
+});
 
 // Create the Tour model using the defined schema
 // This model represents the "tours" collection in the MongoDB database
