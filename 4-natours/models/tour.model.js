@@ -101,7 +101,7 @@ tourSchema.post('save', function (doc, next) {
 // QUERY MIDDLEWARE: Middleware functions that execute before queries like find(), findOne(), findOneAndUpdate(), etc.
 // The `this` keyword in this context refers to the Query object that is about to be executed.
 
-// Pre-query middleware to modify queries before execution
+// PRE-QUERY MIDDLEWARE to modify queries before execution
 // This middleware will be applied to all queries that start with 'find' (e.g., find, findOne, findOneAndUpdate, etc.)
 // It adds a filter to exclude documents where `secretTour` is true and tracks the start time of the query.
 tourSchema.pre(/^find/, function (next) {
@@ -114,7 +114,7 @@ tourSchema.pre(/^find/, function (next) {
   next();
 });
 
-// Post-query middleware that executes after the query has been executed
+// POST-QUERY MIDDLEWARE that executes after the query has been executed
 // This middleware is applied to all queries that start with 'find' (e.g., find, findOne, findOneAndUpdate, etc.)
 // It logs the duration of the query and the documents returned by the query.
 tourSchema.post(/^find/, function (docs, next) {
@@ -123,7 +123,24 @@ tourSchema.post(/^find/, function (docs, next) {
   console.log(`Query took ${Date.now() - this.start} milliseconds`);
 
   // `docs` contains the documents returned by the query
-  console.log(docs);
+  // console.log(docs);
+
+  next();
+});
+
+// AGGREGATION MIDDLEWARE: This middleware is executed before an aggregation pipeline is run.
+// The `pre` hook allows us to modify the aggregation pipeline or add additional stages before the query is executed.
+// This middleware is for the /tour-stats route
+tourSchema.pre('aggregate', function (next) {
+  // `this` refers to the aggregation object.
+
+  // `this.pipeline()` returns the array of stages in the aggregation pipeline.
+  // `unshift()` adds a new stage to the beginning of the pipeline.
+  // We are adding a `$match` stage to filter out documents where `secretTour` is true.
+  this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
+
+  // Log the modified pipeline to the console for debugging purposes.
+  console.log(this.pipeline());
 
   next();
 });
