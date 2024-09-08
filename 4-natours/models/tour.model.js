@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
+const validator = require('validator');
 
 // Define the tour schema which will outline the structure of each document in the "tours" collection
 // The schema enforces specific data types and validation rules for each field
@@ -12,6 +13,7 @@ const tourSchema = new mongoose.Schema(
       trim: true,
       maxLength: [40, 'A tour name must have equal or less than 40 characters'],
       minLength: [10, 'A tour name must have equal or more than 10 characters'],
+      // validate: [validator.isAlpha, 'Tour name must only contain characters'],
     },
     slug: String,
     duration: {
@@ -44,7 +46,16 @@ const tourSchema = new mongoose.Schema(
       type: Number,
       required: [true, 'A tour must have a price'],
     },
-    priceDiscount: Number,
+    priceDiscount: {
+      type: Number,
+      validate: {
+        validator: function (val) {
+          // the this keyword here refers to the current document only when we are creating a new document
+          return val < this.price;
+        },
+        message: 'Discount price ({VALUE}) should be below the regular price',
+      },
+    },
     summary: {
       type: String,
       required: [true, 'A tour must have a summary'],
