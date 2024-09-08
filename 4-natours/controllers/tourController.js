@@ -96,7 +96,7 @@ const createTour = async (req, res) => {
     // Respond with a fail status and error message if invalid data is sent
     res.status(400).json({
       status: 'fail',
-      message: 'Invalid data sent',
+      message: err,
     });
   }
 };
