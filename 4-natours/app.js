@@ -1,6 +1,9 @@
 const express = require('express');
 const morgan = require('morgan');
 
+// Import the global error handler function
+const globalErrorHandler = require('./controllers/errorController');
+
 // Import the custom error class (AppError)
 const AppError = require('./utils/appError');
 
@@ -77,28 +80,8 @@ app.all('*', (req, res, next) => {
   next(new AppError(`Cannot find ${req.originalUrl} on this server`, 404));
 });
 
-/**
- * Simple global error-handling middleware function
- * When we pass in four arguments to a middleware (err, req, res, next),
- * express automatically understands that it is an error handling middleware
- */
-app.use((err, req, res, next) => {
-  // If the error object doesn't have a 'statusCode', set it to 500 (Internal Server Error)
-  err.statusCode = err.statusCode || 500;
-
-  // If the error object doesn't have a 'status', set it to 'error'
-  err.status = err.status || 'error';
-
-  // Respond to the client with the error details
-  // Set the HTTP status to the 'statusCode' from the error object
-  res.status(err.statusCode).json({
-    // Send the status (e.g., 'fail' or 'error') from the error object
-    status: err.status,
-
-    // Send the error message to provide more context about the issue
-    message: err.message,
-  });
-});
+// Middleware to implement global error handling
+app.use(globalErrorHandler);
 
 // Export the Express application to be used in the server file
 module.exports = app;
