@@ -45,5 +45,15 @@ app.use('/api/v1/tours', tourRouter);
 // All routes related to users (e.g., signing up, logging in) will be handled by `userRouter`.
 app.use('/api/v1/users', userRouter);
 
+// Middleware to handle all undefined routes (404 errors)
+// `app.all()` is used to catch requests to any HTTP method (GET, POST, PATCH, etc.)
+// `*` is a wildcard that matches any route not previously defined in the app
+app.all('*', (req, res, next) => {
+  res.status(404).json({
+    status: 'fail',
+    message: `Cannot find ${req.originalUrl} on this server`,
+  });
+});
+
 // Export the Express application to be used in the server file
 module.exports = app;
