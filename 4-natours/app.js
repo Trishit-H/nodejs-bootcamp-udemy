@@ -1,6 +1,9 @@
 const express = require('express');
 const morgan = require('morgan');
 
+// Import the custom error class (AppError)
+const AppError = require('./utils/appError');
+
 // Import router for tour-related routes (e.g., CRUD operations for tours)
 const tourRouter = require('./routes/tourRoutes');
 
@@ -61,10 +64,17 @@ app.all('*', (req, res, next) => {
   // When we pass anything to the next function, Express automatically assumes it to be an error
   // and it will skip all the middlewares in the middleware stack and go straight to the
   // global error handling middleware, where it will be handled
+  /**
   const err = new Error(`Cannot find ${req.originalUrl} on this server`);
   err.status = 'fail';
   err.statusCode = 404;
   next(err);
+   */
+
+  // Using the AppError class to create an error object
+  // Passing the error message and status code when creating the error object
+  // Then passing the error object in the next function
+  next(new AppError(`Cannot find ${req.originalUrl} on this server`, 404));
 });
 
 /**
