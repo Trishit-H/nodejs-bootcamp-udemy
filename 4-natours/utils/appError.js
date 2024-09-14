@@ -1,4 +1,8 @@
-// Define a custom error class that extends the built-in Error class
+/**
+ * Define a custom error class that extends the built-in Error class
+ * We use this class to create error objects, that will be handled later by the
+ * global error handler middleware in `app.js`
+ */
 class AppError extends Error {
   // Constructor method to initialize the custom error
   constructor(message, statusCode) {
