@@ -49,9 +49,44 @@ app.use('/api/v1/users', userRouter);
 // `app.all()` is used to catch requests to any HTTP method (GET, POST, PATCH, etc.)
 // `*` is a wildcard that matches any route not previously defined in the app
 app.all('*', (req, res, next) => {
-  res.status(404).json({
-    status: 'fail',
-    message: `Cannot find ${req.originalUrl} on this server`,
+  // res.status(404).json({
+  //   status: 'fail',
+  //   message: `Cannot find ${req.originalUrl} on this server`,
+  // });
+
+  // Here we define an error object using the Error class
+  // And pass in a string that is set to the message property on the error object
+  // and then we add status and statusCode properties to the error object
+  // Then we call the next function and pass in this error object to it
+  // When we pass anything to the next function, Express automatically assumes it to be an error
+  // and it will skip all the middlewares in the middleware stack and go straight to the
+  // global error handling middleware, where it will be handled
+  const err = new Error(`Cannot find ${req.originalUrl} on this server`);
+  err.status = 'fail';
+  err.statusCode = 404;
+  next(err);
+});
+
+/**
+ * Simple global error-handling middleware function
+ * When we pass in four arguments to a middleware (err, req, res, next),
+ * express automatically understands that it is an error handling middleware
+ */
+app.use((err, req, res, next) => {
+  // If the error object doesn't have a 'statusCode', set it to 500 (Internal Server Error)
+  err.statusCode = err.statusCode || 500;
+
+  // If the error object doesn't have a 'status', set it to 'error'
+  err.status = err.status || 'error';
+
+  // Respond to the client with the error details
+  // Set the HTTP status to the 'statusCode' from the error object
+  res.status(err.statusCode).json({
+    // Send the status (e.g., 'fail' or 'error') from the error object
+    status: err.status,
+
+    // Send the error message to provide more context about the issue
+    message: err.message,
   });
 });
 
