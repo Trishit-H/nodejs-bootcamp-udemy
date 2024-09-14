@@ -28,13 +28,6 @@ app.use(express.static(`${__dirname}/public`));
 
 // 2) CUSTOM MIDDLEWARES
 
-// Custom middleware that logs a message to the console whenever any route is hit
-// This can be useful for debugging or tracking requests in development.
-app.use((req, res, next) => {
-  console.log('Hello from the middleware!');
-  next(); // Call `next()` to proceed to the next middleware or route handler
-});
-
 // Custom middleware to add a `requestTime` property to the `req` object
 // This records the timestamp when the request was received, which can be useful for logging or analytics.
 app.use((req, res, next) => {
