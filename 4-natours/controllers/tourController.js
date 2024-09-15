@@ -59,6 +59,7 @@
  */
 
 const Tour = require('./../models/tour.model');
+const AppError = require('../utils/appError');
 const APIFeatures = require('./../utils/apiFeatures');
 const handleAsyncErrors = require('./../utils/handleAsyncErrors');
 
@@ -111,6 +112,13 @@ const getTour = handleAsyncErrors(async (req, res, next) => {
   // Find a single tour by ID
   const tour = await Tour.findById(req.params.id);
 
+  // If no tour found then create an error object using the
+  // AppError class and pass in the next function to be
+  // handled by the global error handler middleware
+  if (!tour) {
+    return next(new AppError('No tour found with the given ID', 404));
+  }
+
   // Respond with the tour data if found
   res.status(200).json({
     status: 'success',
@@ -150,6 +158,13 @@ const updateTour = handleAsyncErrors(async (req, res, next) => {
     runValidators: true, // Run validators to ensure data integrity
   });
 
+  // If no tour found to update then create an error object using the
+  // AppError class and pass in the next function to be
+  // handled by the global error handler middleware
+  if (!tour) {
+    return next(new AppError('No tour found with the given ID', 404));
+  }
+
   // Respond with the updated tour data
   res.status(200).json({
     status: 'success',
@@ -166,7 +181,14 @@ const updateTour = handleAsyncErrors(async (req, res, next) => {
  */
 const deleteTour = handleAsyncErrors(async (req, res, next) => {
   // Delete the tour by ID
-  await Tour.findByIdAndDelete(req.params.id);
+  const tour = await Tour.findByIdAndDelete(req.params.id);
+
+  // If no tour found to delete then create an error object using the
+  // AppError class and pass in the next function to be
+  // handled by the global error handler middleware
+  if (!tour) {
+    return next(new AppError('No tour found with the given ID', 404));
+  }
 
   // Respond with a success status and no content
   res.status(204).json({
