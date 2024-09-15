@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "start": "NODE_ENV=production node server.js"
   },
   "author": "Trishit Hazra",
   "license": "ISC",
