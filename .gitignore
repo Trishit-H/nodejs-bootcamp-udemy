@@ -4,3 +4,4 @@ node_modules
 config.env
 .env
 eslintrc.json
+scribble.js
