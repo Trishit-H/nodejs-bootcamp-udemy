@@ -21,20 +21,32 @@ const DB_URI = process.env.MONGODB_URI.replace('<PASSWORD>', process.env.DB_PASS
 
 // Connect to the MongoDB database using Mongoose
 // If the connection is successful, log a success message; otherwise, catch and log any errors
-mongoose
-  .connect(DB_URI)
-  .then(() => {
-    console.log('Connection to database successful');
-  })
-  .catch((err) => {
-    console.log('Error connecting to database:', err.message);
-  });
+// Rejected promise is handled by the "unhandledRejection" event listener on the process object
+mongoose.connect(DB_URI).then(() => {
+  console.log('Connection to database successful');
+});
 
 // Define the port on which the server will run, defaulting to 3000 if not specified in the environment
 const PORT = process.env.PORT || 3000;
 
 // Start the server and listen for incoming requests on the specified port
 // Once the server is up, log a message indicating that the app is running
-app.listen(PORT, () => {
-  console.log(`App running on PORT ${PORT}`);
+// We store the result of the listen method on the server variable
+// We will use this `server` variable to close the server later
+const server = app.listen(PORT, () => {
+  console.log(`Server running on PORT ${PORT}`);
+});
+
+// This is listening to unhandled rejection errors i.e., the errors that occurs from
+// promises that are rejected but don't have the catch() method to handle it
+process.on('unhandledRejection', (err) => {
+  console.log(err.name, err.message);
+  console.log('UNHANDLED REJECTION !! SHUTTING DOWN ...');
+
+  // We close the server which gives enough time for the server to finish any request or
+  // work it is currently doing and after it's done we exit our node app
+  server.close(() => {
+    // Exit the process (node application) with a failure code (1)
+    process.exit(1);
+  });
 });
