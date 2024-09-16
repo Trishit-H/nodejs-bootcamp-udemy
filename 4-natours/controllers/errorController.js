@@ -16,6 +16,16 @@ const handleDuplicateFieldMongoose = (err) => {
   return new AppError(message, 400);
 };
 
+// Function to generate errors using AppError class
+// for ValidationError
+const handleValidationError = (err) => {
+  const errorsMessageStr = Object.values(err.errors)
+    .map((el) => el.message)
+    .join(', ');
+  const message = `Invalid input data! ${errorsMessageStr}`;
+  return new AppError(message, 400);
+};
+
 // Function that generates error that will be sent during development
 // In development mode, we provide detailed error information to aid debugging
 const sendErrorDevelopment = (err, res) => {
@@ -88,6 +98,13 @@ module.exports = (err, req, res, next) => {
     // and make it an operational error
     if (error.code === 11000) {
       error = handleDuplicateFieldMongoose(error);
+    }
+
+    // This is for handling errors that occur when a value for a field doesn not
+    // fullfil the validation criteria  in the schema. The error has a name of
+    // "ValidationError"
+    if (error.name === 'ValidationError') {
+      error = handleValidationError(error);
     }
     sendErrorProduction(error, res);
   }
