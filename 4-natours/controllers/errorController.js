@@ -1,8 +1,18 @@
 const AppError = require('./../utils/appError');
 
 // Function to generate errors using AppError class
+// for CastError i.e., invalid ObjectId
 const handleCastErrorMongoose = (err) => {
   const message = `Invalid ${err.path}: ${err.value}`;
+  return new AppError(message, 400);
+};
+
+// Function to generate errors using AppError class
+// for DuplicateKeys
+const handleDuplicateFieldMongoose = (err) => {
+  const message = `${Object.keys(err.keyValue)}: ${Object.values(
+    err.keyValue
+  )} already exists! Enter a different value`;
   return new AppError(message, 400);
 };
 
@@ -70,6 +80,14 @@ module.exports = (err, req, res, next) => {
     // The handling is done in handleCastErrorMongoose function
     if (error.name === 'CastError') {
       error = handleCastErrorMongoose(error);
+    }
+
+    // This is for handling errors that occur when a duplicate value for a field is
+    // entered. The error has no name property but it has a code property that is
+    // set to 11000. We will use this to create an error object using AppError class
+    // and make it an operational error
+    if (error.code === 11000) {
+      error = handleDuplicateFieldMongoose(error);
     }
     sendErrorProduction(error, res);
   }
