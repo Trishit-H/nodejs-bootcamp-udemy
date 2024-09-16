@@ -1,3 +1,11 @@
+const AppError = require('./../utils/appError');
+
+// Function to generate errors using AppError class
+const handleCastErrorMongoose = (err) => {
+  const message = `Invalid ${err.path}: ${err.value}`;
+  return new AppError(message, 400);
+};
+
 // Function that generates error that will be sent during development
 // In development mode, we provide detailed error information to aid debugging
 const sendErrorDevelopment = (err, res) => {
@@ -51,6 +59,18 @@ module.exports = (err, req, res, next) => {
 
     // Check if the application is in production mode
   } else if (process.env.NODE_ENV === 'production') {
-    sendErrorProduction(err, res);
+    // Had to do this instead of `let error = {...err}` to copy the err object because
+    // the spread operator does a shallow copy and for some reason doesn't copy
+    // the "name" property from the err object and god knows what else
+    let error = JSON.parse(JSON.stringify(err));
+
+    // This is for handling errors that are made when an invalid object id for mongoose
+    // is passed which results in an CastError. And so it is an operational error
+    // and we have to make an error object using AppError class to make it operational
+    // The handling is done in handleCastErrorMongoose function
+    if (error.name === 'CastError') {
+      error = handleCastErrorMongoose(error);
+    }
+    sendErrorProduction(error, res);
   }
 };
