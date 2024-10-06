@@ -9,6 +9,24 @@
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 
+// THIS MUST BE ON TOP
+// Handling uncaught exceptions
+// Uncaught exceptions - all errors or bugs that occur in our synchronous code but are
+// not handled anywhere in the program
+// To handle this process object emits the "uncaughtException" event which we can listen to
+// using process.on
+process.on('uncaughtException', (err) => {
+  console.log('UNCAUGHT EXCEPTION !! SHUTTING DOWN ...');
+  console.log({
+    name: err.name,
+    message: err.message,
+    error: err,
+  });
+
+  // Exit the process (node application) with a failure code (1)
+  process.exit(1);
+});
+
 // Load environment variables from the config.env file into process.env
 // This allows us to access environment-specific variables (e.g., DB credentials, PORT)
 dotenv.config({ path: './config.env' });
@@ -40,8 +58,12 @@ const server = app.listen(PORT, () => {
 // This is listening to unhandled rejection errors i.e., the errors that occurs from
 // promises that are rejected but don't have the catch() method to handle it
 process.on('unhandledRejection', (err) => {
-  console.log(err.name, err.message);
   console.log('UNHANDLED REJECTION !! SHUTTING DOWN ...');
+  console.log({
+    name: err.name,
+    message: err.message,
+    error: err,
+  });
 
   // We close the server which gives enough time for the server to finish any request or
   // work it is currently doing and after it's done we exit our node app
