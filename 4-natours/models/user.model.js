@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
+const bcrypt = require('bcryptjs');
 
 // Define the User schema with validation rules
 const userSchema = new mongoose.Schema({
@@ -44,6 +45,28 @@ const userSchema = new mongoose.Schema({
 			message: 'Password does not match!',
 		},
 	},
+});
+
+// Password encryption using pre document middleware
+// Only encrypt the password if it is changed/updated or,
+// the password is newly created
+userSchema.pre('save', async function (next) {
+	// Check if the password field has been modified
+	// If not, we return from this function and call `next()` to proceed to the next middleware
+	// This avoids rehashing the password if it hasn't been changed
+	if (!this.isModified('password')) return next();
+
+	// If the password has been modified, hash it using bcrypt
+	// We pass `10` as the salt rounds, which defines the cost factor (higher is more secure but slower)
+	// This hashing ensures the password is stored securely and isn't saved as plain text
+	this.password = await bcrypt.hash(this.password, 10);
+
+	// Set `passwordConfirm` to undefined to remove it from the database
+	// `passwordConfirm` is only required for user input validation; it’s not needed in the database
+	this.passwordConfirm = undefined;
+
+	// Call `next()` to proceed to the next middleware in the chain
+	next();
 });
 
 // Create and export the User model based on the userSchema
