@@ -31,10 +31,18 @@ const userSchema = new mongoose.Schema({
 	},
 
 	// Password confirmation field with required validation
-	// We will add more validation and rules when we start to manage passwords
+	// A validator function that checks whether the password and passwordConfirm
+	// fields match or not
 	passwordConfirm: {
 		type: String,
 		required: [true, 'Please confirm your password!'],
+		validate: {
+			//  This only works on save() and create() methods!!
+			validator: function (val) {
+				return val === this.password;
+			},
+			message: 'Password does not match!',
+		},
 	},
 });
 
