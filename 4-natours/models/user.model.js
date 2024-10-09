@@ -29,6 +29,7 @@ const userSchema = new mongoose.Schema({
 		type: String,
 		required: [true, 'Please add a password for your account!'],
 		minLength: [8, 'Password must be at least 8 characters long!'],
+		select: true,
 	},
 
 	// Password confirmation field with required validation
