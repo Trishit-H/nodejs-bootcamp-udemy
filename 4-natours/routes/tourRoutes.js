@@ -8,7 +8,8 @@ const {
   aliasTopTours,
   getTourStatistics,
   getMonthlyPlan,
-} = require('../controllers/tourController');
+} = require('./../controllers/tourController');
+const { protectedRoute } = require('./../controllers/authController.js');
 
 const router = express.Router();
 
@@ -22,7 +23,7 @@ router.route('/tour-stats').get(getTourStatistics);
 router.route('/monthly-plan/:year').get(getMonthlyPlan);
 
 // Routes for handling all tours (GET all tours and POST a new tour)
-router.route('/').get(getAllTours).post(createTour);
+router.route('/').get(protectedRoute, getAllTours).post(createTour);
 
 // Routes for handling a single tour by ID (GET, PATCH, DELETE)
 router.route('/:id').get(getTour).patch(updateTour).delete(deleteTour);
