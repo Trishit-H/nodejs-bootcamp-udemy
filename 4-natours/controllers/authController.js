@@ -9,6 +9,18 @@
 const jwt = require('jsonwebtoken');
 const User = require('./../models/user.model.js');
 const handleAsyncErrors = require('./../utils/handleAsyncErrors.js');
+const AppError = require('./../utils/appError.js');
+
+// Function to generate a JSON Web Token for a user based on their user ID
+/**
+ * @param {String} id - The mongodb _id of a user document
+ * @returns {String} - JWT token
+ */
+const signToken = (id) => {
+	return jwt.sign({ id }, process.env.JWT_SECRET, {
+		expiresIn: process.env.JWT_EXPIRES_IN,
+	});
+};
 
 /**
  * Controller function to create/sign-up a new user
@@ -33,11 +45,13 @@ const signUp = handleAsyncErrors(async (req, res) => {
 		passwordConfirm: req.body.passwordConfirm, // Confirmation of the user's password
 	});
 
-	// Generate a JSON Web Token (JWT) for the newly created user.
+	// Set password to undefined before sending the response
+	// This is to ensure we don't leak password as a security flaw
+	newUser.password = undefined;
+
+	// Generate a JSON Web Token (JWT) for the newly created user using the `signToken` method
 	// This token is used for authentication in subsequent requests, allowing the user to remain logged in.
-	const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
-		expiresIn: process.env.JWT_EXPIRES_IN, // Token expiration time, set in environment variables
-	});
+	const token = signToken(newUser._id);
 
 	// Send a response back to the client with the status, token, and user data.
 	res.status(201).json({
@@ -49,6 +63,41 @@ const signUp = handleAsyncErrors(async (req, res) => {
 	});
 });
 
+/**
+ * Controller function for logging in an existing user.
+ * This function validates the user's credentials (email and password)
+ * and generates a JWT token if they are valid.
+ */
+const login = handleAsyncErrors(async (req, res, next) => {
+	const { email, password } = req.body;
+
+	// Check if both email and password are provided
+	if (!email || !password) {
+		return next(new AppError('Please provide email and password', 400));
+	}
+
+	// Query the database for the user by email, including the password field,
+	// which is typically excluded due to `select: false` in the User schema
+	// so we have to add a `+` sign when selection password
+	const user = await User.findOne({ email }).select('+password');
+
+	// Verify the user exists and that the provided password matches the stored password
+	// To do that we use the `checkPassword`instance method that we defined in the userSchema
+	if (!user || !(await user.checkPassword(password, user.password))) {
+		return next(new AppError('Incorrect email or password', 401));
+	}
+
+	// Generate a new token for the user upon successful login
+	const token = signToken(user._id);
+
+	// Send success response with the token to authenticate future requests
+	res.status(200).json({
+		status: 'success',
+		token,
+	});
+});
+
 module.exports = {
 	signUp,
+	login,
 };
