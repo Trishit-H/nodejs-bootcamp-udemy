@@ -29,7 +29,7 @@ const userSchema = new mongoose.Schema({
 		type: String,
 		required: [true, 'Please add a password for your account!'],
 		minLength: [8, 'Password must be at least 8 characters long!'],
-		select: true,
+		select: false,
 	},
 
 	// Password confirmation field with required validation
@@ -69,6 +69,23 @@ userSchema.pre('save', async function (next) {
 	// Call `next()` to proceed to the next middleware in the chain
 	next();
 });
+
+/**
+ * Instance method to compare candidate password with hashed password in the database.
+ *
+ * This method checks if the provided password (candidatePassword) matches the hashed password
+ * stored in the database (userPassword). Since the `password` field is set to `select: false`,
+ * it won't be included in query results by default, so we need to pass it manually as `userPassword`.
+ *
+ * @param {String} candidatePassword - The password input by the user attempting to log in.
+ * @param {String} userPassword - The hashed password retrieved from the user document in the database.
+ * @returns {Boolean} - Returns true if passwords match, false otherwise.
+ */
+userSchema.methods.checkPassword = async function (candidatePassword, userPassword) {
+	// Uses bcrypt's compare function to match the candidate password and the hashed password.
+	// The `bcrypt.compare` method will hash `candidatePassword` and check it against `userPassword`.
+	return await bcrypt.compare(candidatePassword, userPassword);
+};
 
 // Create and export the User model based on the userSchema
 const User = mongoose.model('User', userSchema);
