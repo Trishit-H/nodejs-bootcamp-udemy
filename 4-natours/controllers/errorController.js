@@ -11,7 +11,7 @@ const handleCastErrorMongoose = (err) => {
 // for DuplicateKeys
 const handleDuplicateFieldMongoose = (err) => {
   const message = `${Object.keys(err.keyValue)}: ${Object.values(
-    err.keyValue
+    err.keyValue,
   )} already exists! Enter a different value`;
   return new AppError(message, 400);
 };
@@ -79,10 +79,17 @@ module.exports = (err, req, res, next) => {
 
     // Check if the application is in production mode
   } else if (process.env.NODE_ENV === 'production') {
+    console.log(err);
     // Had to do this instead of `let error = {...err}` to copy the err object because
     // the spread operator does a shallow copy and for some reason doesn't copy
     // the "name" property from the err object and god knows what else
     let error = JSON.parse(JSON.stringify(err));
+
+    // Also for some reason the message property is not getting copied
+    // when we get a new AppError from the first return statement in
+    // the login controller function. So here, the message property is added
+    // manually
+    error.message = err.message;
 
     // This is for handling errors that are made when an invalid object id for mongoose
     // is passed which results in an CastError. And so it is an operational error
