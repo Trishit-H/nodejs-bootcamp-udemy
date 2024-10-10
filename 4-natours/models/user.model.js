@@ -23,6 +23,14 @@ const userSchema = new mongoose.Schema({
   // Photo field (optional) to store the user's profile image URL or path
   photo: String,
 
+  // Role field to store various user roles that is used  for
+  // authorize users for specific tasks, which defaults to `user` role
+  role: {
+    type: String,
+    enum: ['user', 'guide', 'lead-guide', 'admin'],
+    default: 'user',
+  },
+
   // Password field with required validation and minimum length of 8 characters
   // We will add more validation and rules when we start to manage passwords
   password: {
