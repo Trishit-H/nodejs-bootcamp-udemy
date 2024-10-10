@@ -45,6 +45,7 @@ const signUp = handleAsyncErrors(async (req, res) => {
     password: req.body.password, // User's password, must meet security requirements
     passwordConfirm: req.body.passwordConfirm, // Confirmation of the user's password
     passwordChangedAt: req.body.passwordChangedAt || undefined,
+    role: req.body.role || 'user',
   });
 
   // Set password to undefined before sending the response
@@ -147,8 +148,36 @@ const protectedRoute = handleAsyncErrors(async (req, res, next) => {
   next();
 });
 
+/**
+ * `restrictedRoute` is a higher-order middleware function that restricts access to specific user roles
+ * It uses closures to "remember" the roles passed to it and checks if the authenticated user has permission.
+ */
+const restrictedRoute =
+  // Accepts a variable number of role arguments (e.g., 'admin', 'manager')
+  // and collects them into an array called `roles` using the rest parameter.
+
+    (...roles) =>
+    // Returns the actual middleware function, with access to `roles` due to closures.
+    (req, res, next) => {
+      // `req.user` is expected to be populated by a prior authentication middleware - `protectedRoute`.
+      // This middleware should authenticate the user and store user data in `req.user`.
+
+      // Checks if the user's role, `req.user.role`, is included in the allowed `roles` array.
+      if (!roles.includes(req.user.role)) {
+        // If the user's role is not allowed, an error is passed to the next middleware
+        // with a 403 Forbidden status code and an error message.
+        return next(
+          new AppError('You do not have permission to perform this action', 403)
+        );
+      }
+
+      // If the user has one of the allowed roles, `next()` is called to proceed with the request.
+      next();
+    };
+
 module.exports = {
   signUp,
   login,
   protectedRoute,
+  restrictedRoute,
 };
