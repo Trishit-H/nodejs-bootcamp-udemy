@@ -11,7 +11,7 @@ const handleCastErrorMongoose = (err) => {
 // for DuplicateKeys
 const handleDuplicateFieldMongoose = (err) => {
   const message = `${Object.keys(err.keyValue)}: ${Object.values(
-    err.keyValue,
+    err.keyValue
   )} already exists! Enter a different value`;
   return new AppError(message, 400);
 };
@@ -25,6 +25,11 @@ const handleValidationError = (err) => {
   const message = `Invalid input data! ${errorsMessageStr}`;
   return new AppError(message, 400);
 };
+
+const handleJWTError = () => new AppError('Invalid token. Please login again!', 401);
+
+const handleJWTExpiredError = () =>
+  new AppError('Token expired. Please login again!', 401);
 
 // Function that generates error that will be sent during development
 // In development mode, we provide detailed error information to aid debugging
@@ -79,7 +84,6 @@ module.exports = (err, req, res, next) => {
 
     // Check if the application is in production mode
   } else if (process.env.NODE_ENV === 'production') {
-    console.log(err);
     // Had to do this instead of `let error = {...err}` to copy the err object because
     // the spread operator does a shallow copy and for some reason doesn't copy
     // the "name" property from the err object and god knows what else
@@ -113,6 +117,15 @@ module.exports = (err, req, res, next) => {
     if (error.name === 'ValidationError') {
       error = handleValidationError(error);
     }
+
+    if (error.name === 'JsonWebTokenError') {
+      error = handleJWTError();
+    }
+
+    if (error.name === 'TokenExpiredError') {
+      error = handleJWTExpiredError();
+    }
+
     sendErrorProduction(error, res);
   }
 };
