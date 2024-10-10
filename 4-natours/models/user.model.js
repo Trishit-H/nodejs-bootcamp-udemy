@@ -46,6 +46,12 @@ const userSchema = new mongoose.Schema({
       message: 'Password does not match!',
     },
   },
+
+  // This field stores the time at which the password
+  // was changed
+  passwordChangedAt: {
+    type: Date,
+  },
 });
 
 // Password encryption using pre document middleware
@@ -85,6 +91,36 @@ userSchema.methods.checkPassword = async function (candidatePassword, userPasswo
   // Uses bcrypt's compare function to match the candidate password and the hashed password.
   // The `bcrypt.compare` method will hash `candidatePassword` and check it against `userPassword`.
   return await bcrypt.compare(candidatePassword, userPassword);
+};
+
+/**
+ * Checks if the user changed their password after the provided JWT token's creation.
+ *
+ * This method compares the `passwordChangedAt` timestamp with the JWT token's timestamp.
+ * It helps determine if the JWT token should still be valid or if the user needs to re-authenticate
+ * due to a recent password change.
+ *
+ * @method
+ * @param {number} JWTTimestamp - The timestamp (in seconds) when the JWT token was issued.
+ * @returns {boolean} - Returns `true` if the password was changed after the token was issued, indicating the
+ *                      token should no longer be valid. Returns `false` if the password was not changed
+ *                      after the token's issuance, so the token remains valid.
+ */
+userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
+  if (this.passwordChangedAt) {
+    // Convert `passwordChangedAt` date to a timestamp in seconds
+    const changedTimestamp = parseInt(this.passwordChangedAt.getTime() / 1000);
+
+    console.log(changedTimestamp, JWTTimestamp);
+
+    // If `changedTimestamp` is greater than `JWTTimestamp`,
+    // the password was changed after the JWT was created.
+    return JWTTimestamp < changedTimestamp;
+  }
+
+  // If `passwordChangedAt` is undefined, the password has not been changed,
+  // meaning the JWT token remains valid.
+  return false;
 };
 
 // Create and export the User model based on the userSchema
