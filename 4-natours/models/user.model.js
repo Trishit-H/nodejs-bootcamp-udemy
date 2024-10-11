@@ -94,6 +94,24 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
+// Middleware to set `passwordChangedAt` timestamp for the user document
+// Runs before saving the document, but only if the password has been modified
+userSchema.pre('save', function (next) {
+  // If the password field is not modified or the document is new, exit the middleware
+  // `this.isModified('password')` checks if the password was changed
+  // `this.isNew` checks if the document is newly created
+  if (!this.isModified('password') || this.isNew) return next();
+
+  // Set the `passwordChangedAt` property to the current time minus 1 second
+  // This ensures the timestamp is slightly earlier than the JWT creation time (because
+  // sometimes the jwt token is created  before the document is saved) to avoid issues
+  // where the token is generated before the password is updated
+  this.passwordChangedAt = Date.now() - 1000;
+
+  // Move to the next middleware in the stack
+  next();
+});
+
 /**
  * Instance method to compare candidate password with hashed password in the database.
  *
