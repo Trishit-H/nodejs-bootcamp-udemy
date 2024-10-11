@@ -23,7 +23,7 @@ router.post('/login', login);
 
 // These routes are for forgot and reset password
 router.post('/forgot-password', forgotPassword);
-router.patch('/reset-password', resetPassword);
+router.patch('/reset-password/:token', resetPassword);
 
 router.route('/').get(getAllUsers).post(createUser);
 router.route('/:id').get(getUser).patch(updateUser).delete(deleteUser);
