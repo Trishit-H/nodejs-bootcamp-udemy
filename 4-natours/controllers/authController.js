@@ -11,6 +11,7 @@ const jwt = require('jsonwebtoken');
 const User = require('./../models/user.model.js');
 const handleAsyncErrors = require('./../utils/handleAsyncErrors.js');
 const AppError = require('./../utils/appError.js');
+const sendEmail = require('./../utils/email.js');
 
 // Function to generate a JSON Web Token for a user based on their user ID
 /**
@@ -175,9 +176,86 @@ const restrictedRoute =
       next();
     };
 
+/**
+ * Forgot Password Controller
+ * This asynchronous function handles the password reset process by:
+ * 1) Checking if the user exists based on the provided email.
+ * 2) Generating a unique, temporary token for password reset and saving it to the database.
+ * 3) Sending an email to the user with a link to reset their password.
+
+ * How It Works:
+ * - If no user is found with the given email, the function sends a 404 error.
+ * - If the user is found:
+ *    1) A reset token is created using the `createPasswordResetToken` instance method which also 
+ *       temporarily stores the token on the user object, in the passwordResetToken field defined in the userSchema.
+ *    2) The user data is saved (to save the passwordResetToken field), bypassing validations (so that only the token updates).
+ *    3) An email with the reset URL is sent to the user.
+ * - If email sending fails, the function clears the reset token fields and reports an error.
+ */
+const forgotPassword = handleAsyncErrors(async (req, res, next) => {
+  // 1) Get user based on POSTed email
+  // Finds the user in the database by matching the email provided in the request body
+  const user = await User.findOne({ email: req.body.email });
+
+  // If no user is found, return an error to the client
+  if (!user) {
+    // Passes an error to the next middleware, indicating that no user exists with this email
+    return next(new AppError('There is no user with this email address', 404));
+  }
+
+  // 2) Generate the random reset token
+  // Calls a method on the user instance to create a random password reset token
+  const resetToken = user.createPasswordResetToken();
+  // Saves the reset token and its expiration time to the user document in the database
+  // `validateBeforeSave: false` bypasses other schema validations to allow quick saving of just the reset token fields
+  await user.save({ validateBeforeSave: false });
+
+  // 3) Send it to user's email
+  // Constructs the password reset URL, which includes the generated reset token as part of the URL
+  // URL would look like this - http://127.0.0.1:8000/api/v1/users/reset-password/57843ytu74t74twejfbyugfywe
+  const resetURL = `${req.protocol}://${req.get(
+    'host'
+  )}/api/v1/users/reset-password/${resetToken}`;
+
+  // Defines the email message with instructions for the user to reset their password
+  const message = `Forgot your password? Submit a patch request with your new password 
+  and passwordConfirm to: ${resetURL}\nIf you didn't forget your password, please ignore this
+  email`;
+
+  try {
+    // Attempts to send an email to the user's email address containing the reset token and instructions
+    await sendEmail({
+      email: user.email,
+      subject: 'Your password reset token (valid for only 10 minutes)',
+      message,
+    });
+
+    // Sends a successful response to the client, confirming that the reset email has been sent
+    res.status(200).json({
+      status: 'success',
+      message: 'Password reset token sent to your email',
+    });
+  } catch (err) {
+    // If email sending fails, clears the reset token fields on the user document
+    user.passwordResetToken = undefined;
+    user.passwordResetTokenExpires = undefined;
+    // Saves the user document without the reset token fields, disabling validation for quick update
+    await user.save({ validateBeforeSave: false });
+
+    // Passes an error to the next middleware, indicating a problem with sending the email
+    return next(
+      new AppError('There was an error sending the email. Try again later.', 500)
+    );
+  }
+});
+
+const resetPassword = (req, res, next) => {};
+
 module.exports = {
   signUp,
   login,
   protectedRoute,
   restrictedRoute,
+  forgotPassword,
+  resetPassword,
 };
