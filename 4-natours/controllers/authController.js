@@ -1,11 +1,12 @@
 /**
- * authController.js function is responsible for
+ * authController.js file is responsible for
  *   - sign up users
  *   - sign in users
  *   - resetting password
  *   - and all things related to authentication
  */
 
+const crypto = require('node:crypto');
 const { promisify } = require('util');
 const jwt = require('jsonwebtoken');
 const User = require('./../models/user.model.js');
@@ -157,6 +158,7 @@ const restrictedRoute =
   // Accepts a variable number of role arguments (e.g., 'admin', 'manager')
   // and collects them into an array called `roles` using the rest parameter.
 
+
     (...roles) =>
     // Returns the actual middleware function, with access to `roles` due to closures.
     (req, res, next) => {
@@ -249,7 +251,76 @@ const forgotPassword = handleAsyncErrors(async (req, res, next) => {
   }
 });
 
-const resetPassword = (req, res, next) => {};
+/**
+ * resetPassword - Resets a user's password using a secure token provided in the URL.
+ *
+ * Workflow:
+ * 1. Retrieves the user based on an encrypted token and checks if it is valid.
+ * 2. If valid, updates the user's password and clears the reset token fields.
+ * 3. Ensures the password validation occurs and updates the `passwordChangedAt` field.
+ * 4. Logs the user in by generating a new JSON Web Token (JWT) and sends it as the response.
+ */
+const resetPassword = handleAsyncErrors(async (req, res, next) => {
+  // 1) Get the user based on the token
+  // To do this we need the unencrypted token from the reset-password url. Then we will encrypt it
+  // using the same process we did to encrypt it in the `createResetPasswordToken` instance method
+  // defined on the userSchema. We do this because, using that particular process, we always get the
+  // same encrypted value for an input no matter how many times we run it.
+  // T hen we can use this token to do a findOne({passwordResetToken: value}) query to find the user
+
+  // 1.a) Encrypt the hash token that we get from req.params
+  const hashedToken = crypto.createHash('sha256').update(req.params.token).digest('hex');
+
+  // 1.b) Find the user using this encrypted token and check if the token expiration time is greater
+  // than the current date to deterime if the token is still valid or not
+  const user = await User.findOne({
+    passwordResetToken: hashedToken,
+    passwordResetTokenExpires: { $gt: Date.now() },
+  });
+
+  // 2) If the token has not expired, and there is a user, set the new password
+  // and also use `passwordConfirm` field to check if the passwords are same. Then set
+  // the `passwordResetToken` and `passwordResetTokenExpires` fields to undefined which
+  // essentially deletes these fields from the database
+
+  // 2.a) If no user is foud using the token that is appended in the url, then it means
+  // either the token has expired or it the user doesn't correspond with this particular
+  // token. In that case send back an error
+  if (!user) {
+    return next(new AppError('Token has either expired or is not valid', 400));
+  }
+
+  // 2.b) Set the password and passwordConfirm field from req.body
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+
+  // 2.c) Set the `passwordResetToken` and `passwordResetTokenExpires` field to undefined
+  // to delete them from the user document.
+  user.passwordResetToken = undefined;
+  user.passwordResetTokenExpires = undefined;
+
+  // 2.d) Then we save the user document. This time without using { validateBeforeSave: false }.
+  // This ensures that the `password` and `passwordConfirm` fields are validated.
+  // This doesn't throw errors for other fields that are required because we updating an existing
+  // field even though the validation runs for all the fields in the document
+  await user.save();
+
+  // 3) Update the changedPasswordAt property for the user
+  // This is done using the pre save hook that is defined on the userSchema
+
+  // 4) After the password has been updated, we need to login the user.
+  // We do this by generating a jsonwebtoken and sending it back as a response
+  // Using the token, the client can login again.
+
+  // 4.a) Generate the token using `signToken` function
+  const token = signToken(user._id);
+
+  // 4.b) Send the token back as response allowing the user to login
+  res.status(200).json({
+    status: 'success',
+    token,
+  });
+});
 
 module.exports = {
   signUp,
