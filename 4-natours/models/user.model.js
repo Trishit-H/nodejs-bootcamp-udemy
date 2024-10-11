@@ -1,3 +1,4 @@
+const crypto = require('node:crypto');
 const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
@@ -60,6 +61,15 @@ const userSchema = new mongoose.Schema({
   passwordChangedAt: {
     type: Date,
   },
+
+  // Field for storing a temporary reset token
+  // This token is generated when a user requests to reset their password and
+  // will be compared with the incoming token to validate the reset request.
+  passwordResetToken: String,
+
+  // Field for storing the expiration time of the reset token
+  // This helps ensure the reset link is only valid for a limited time, improving security.
+  passwordResetTokenExpires: Date,
 });
 
 // Password encryption using pre document middleware
@@ -129,6 +139,30 @@ userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
   // If `passwordChangedAt` is undefined, the password has not been changed,
   // meaning the JWT token remains valid.
   return false;
+};
+
+/**
+ * Generates a password reset token for the user.
+ * This method creates a random reset token, hashes it for secure storage, and sets
+ * an expiration time for the token. The raw reset token is returned for sending
+ * to the user, while only the hashed version is stored in the database.
+ *
+ * @method
+ * @returns {string} The raw reset token to be sent to the user for password reset verification.
+ */
+userSchema.methods.createPasswordResetToken = function () {
+  // Generate a random token for password reset (32 bytes in hex format).
+  const resetToken = crypto.randomBytes(32).toString('hex');
+
+  // Hash the token using SHA-256 and store it in the database.
+  // Storing only the hashed version helps secure the reset process.
+  this.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+
+  // Set expiration time to 10 minutes from now to limit token validity period.
+  this.passwordResetTokenExpires = Date.now() + 10 * 60 * 1000;
+
+  // Return the raw token for sending in the reset email to the user.
+  return resetToken;
 };
 
 // Create and export the User model based on the userSchema
