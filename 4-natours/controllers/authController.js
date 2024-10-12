@@ -26,6 +26,28 @@ const signToken = (id) => {
 };
 
 /**
+ * Creates a JSON Web Token (JWT) for a user and sends it in the response.
+ *
+ * @function createAndSendToken
+ * @param {Object} user - The user object containing user details, including the user's ID.
+ * @param {number} statusCode - HTTP status code to send in the response.
+ * @param {Object} res - Express response object used to send the response back to the client.
+ *
+ * @returns {void} Sends a JSON response containing the status, token, and user data.
+ */
+const createAndSendToken = (user, statusCode, res) => {
+  const token = signToken(user._id);
+
+  res.status(statusCode).json({
+    status: 'success',
+    token,
+    data: {
+      user,
+    },
+  });
+};
+
+/**
  * Controller function to create/sign-up a new user
  * This function handles the user registration process, ensuring data integrity
  * and security by validating and controlling the input fields.
@@ -54,18 +76,9 @@ const signUp = handleAsyncErrors(async (req, res) => {
   // This is to ensure we don't leak password as a security flaw
   newUser.password = undefined;
 
-  // Generate a JSON Web Token (JWT) for the newly created user using the `signToken` method
-  // This token is used for authentication in subsequent requests, allowing the user to remain logged in.
-  const token = signToken(newUser._id);
-
-  // Send a response back to the client with the status, token, and user data.
-  res.status(201).json({
-    status: 'success', // Indicate the request was successful
-    token, // Send the generated token to the client
-    data: {
-      user: newUser, // Send the created user data back to the client
-    },
-  });
+  // Use the `createAndSendToken` method to generate a jwt token and send it back as a response
+  // to the client so they can use it to subsequently login to their account
+  createAndSendToken(newUser, 201, res);
 });
 
 /**
@@ -92,14 +105,9 @@ const login = handleAsyncErrors(async (req, res, next) => {
     return next(new AppError('Incorrect email or password', 401));
   }
 
-  // Generate a new token for the user upon successful login
-  const token = signToken(user._id);
-
-  // Send success response with the token to authenticate future requests
-  res.status(200).json({
-    status: 'success',
-    token,
-  });
+  // Generate and send a new token for the user upon successful login using the
+  // `createAndSendToken` method
+  createAndSendToken(user, 200, res);
 });
 
 /**
@@ -312,14 +320,40 @@ const resetPassword = handleAsyncErrors(async (req, res, next) => {
   // We do this by generating a jsonwebtoken and sending it back as a response
   // Using the token, the client can login again.
 
-  // 4.a) Generate the token using `signToken` function
-  const token = signToken(user._id);
+  // We do this using the `createAndSendToken` function
+  createAndSendToken(user, 200, res);
+});
 
-  // 4.b) Send the token back as response allowing the user to login
-  res.status(200).json({
-    status: 'success',
-    token,
-  });
+/**
+ * UpdatePassword controller - It is used for the user to update their update password
+ * only when they are logged in
+ */
+const updatePassword = handleAsyncErrors(async (req, res, next) => {
+  // 1) Get user from collection
+  // Since the user is logged in, the data is available on the request object
+  // as `req.user`
+  const user = await User.findById(req.user._id).select('+password');
+
+  // 2) Check if POSTed current password is correct
+  // To check if the password entered by the user and the password stored in the
+  // database, we use the `checkPassword` instance method defined on the userSchema
+  if (!(await user.checkPassword(req.body.passwordCurrent, user.password))) {
+    return next(new AppError('Incorrect password!', 401));
+  }
+
+  // 3) If so, update the password
+  /**
+   * Also why use save() and not directly use `updateOne` or `findOneAndUpdate` methods?
+   * This is because, we have some pre-save hooks that need to run on documents before saving
+   * and some validators for the `password` field. The pre-save hook only runs for `save` and `create`.
+   * So we can't use updateOne` or `findOneAndUpdate` and similar methods.
+   */
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+  await user.save();
+
+  // 4) Log the user in again i.e., send JWT
+  createAndSendToken(user, 200, res);
 });
 
 module.exports = {
@@ -329,4 +363,5 @@ module.exports = {
   restrictedRoute,
   forgotPassword,
   resetPassword,
+  updatePassword,
 };
