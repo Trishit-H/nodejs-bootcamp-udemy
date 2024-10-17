@@ -61,6 +61,23 @@ const updateMe = handleAsyncErrors(async (req, res, next) => {
   });
 });
 
+/**
+ * Controller function to let the user delete their account
+ * Marks the user's account as inactive by setting the 'active' field to false.
+ * This is a "soft delete" function, meaning the user's data isn't removed
+ * from the database but is instead flagged as inactive, allowing future reactivation
+ * or retention of associated data.
+ * Sends a 204 status response indicating successful operation with no content.
+ */
+const deleteMe = handleAsyncErrors(async (req, res, next) => {
+  await User.findByIdAndUpdate(req.user._id, { active: false });
+
+  res.status(204).json({
+    status: 'success',
+    data: null,
+  });
+});
+
 // function to get all users
 const getAllUsers = (req, res) => {
   res.status(500).json({
@@ -108,4 +125,5 @@ module.exports = {
   updateUser,
   deleteUser,
   updateMe,
+  deleteMe,
 };

@@ -70,6 +70,14 @@ const userSchema = new mongoose.Schema({
   // Field for storing the expiration time of the reset token
   // This helps ensure the reset link is only valid for a limited time, improving security.
   passwordResetTokenExpires: Date,
+
+  // Field used to "soft delete a user
+  // if set to false, it means user has been "deleted"
+  active: {
+    type: Boolean,
+    default: true,
+    select: false,
+  },
 });
 
 // Password encryption using pre document middleware
