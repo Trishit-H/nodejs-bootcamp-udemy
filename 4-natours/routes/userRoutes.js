@@ -7,6 +7,7 @@ const {
   updateUser,
   deleteUser,
   updateMe,
+  deleteMe,
 } = require('../controllers/userController');
 
 const {
@@ -29,6 +30,9 @@ router.patch('/updateMyPassword', protectedRoute, updatePassword);
 
 // Route for user to update data besides their password when they are logged in
 router.patch('/updateMe', protectedRoute, updateMe);
+
+// Route for user to delete their account when they are logged in
+router.delete('/deleteMe', protectedRoute, deleteMe);
 
 // These routes are for forgot and reset password
 router.post('/forgot-password', forgotPassword);
