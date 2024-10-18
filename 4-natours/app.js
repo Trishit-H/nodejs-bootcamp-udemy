@@ -1,6 +1,7 @@
 const express = require('express');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
 
 // Import the global error handler function
 const globalErrorHandler = require('./controllers/errorController');
@@ -18,6 +19,9 @@ const userRouter = require('./routes/userRoutes');
 const app = express();
 
 // 1) MIDDLEWARES
+
+// Set security http headers using helmet
+app.use(helmet());
 
 // Morgan middleware for logging HTTP request information (only in development mode)
 // This middleware logs details such as method, status, response time, etc., which helps with debugging.
