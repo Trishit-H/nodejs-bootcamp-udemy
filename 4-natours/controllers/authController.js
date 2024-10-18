@@ -38,6 +38,33 @@ const signToken = (id) => {
 const createAndSendToken = (user, statusCode, res) => {
   const token = signToken(user._id);
 
+  /**
+   * [LECTURE 142] If you are taking notes in your notebook, then remember this feature
+   * of sending jwt token via cookie was added in lecture 142.
+   */
+
+  // Cookie options -
+  // `expires` - set to the same expiry time as the jwt token expiry time
+  // `httpOnly`- to make sure that the cookie is not modified in any way in the browser
+  const cookieOptions = {
+    expires: new Date(
+      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+    ),
+    httpOnly: true,
+  };
+
+  // We set the `secure` option to true only in production mode
+  // This means the cookie will be shared only over `https` connection
+  // And since we are writing our api in development mode, setting this option
+  // to true by default will make it not work
+  if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
+
+  // Sending the token as cookie
+  // First parameter - name of the cookie
+  // Secnd parameter - value of the cookie
+  // Third parameter - the cookie options object
+  res.cookie('jwt', token, cookieOptions);
+
   res.status(statusCode).json({
     status: 'success',
     token,
