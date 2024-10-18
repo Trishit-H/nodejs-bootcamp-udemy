@@ -71,7 +71,7 @@ const userSchema = new mongoose.Schema({
   // This helps ensure the reset link is only valid for a limited time, improving security.
   passwordResetTokenExpires: Date,
 
-  // Field used to "soft delete a user
+  // Field used to "soft delete" a user
   // if set to false, it means user has been "deleted"
   active: {
     type: Boolean,
@@ -117,6 +117,15 @@ userSchema.pre('save', function (next) {
   this.passwordChangedAt = Date.now() - 1000;
 
   // Move to the next middleware in the stack
+  next();
+});
+
+// This middleware runs before any query that starts with "find" (e.g., find, findOne).
+// It automatically modifies the query to exclude documents where the 'active' field is set to false.
+// If 'active' is not false or does not exist, the document will be included in the query results.
+// The 'next()' function is called to proceed with the next middleware or execute the query.
+userSchema.pre(/^find/, function (next) {
+  this.find({ active: { $ne: false } });
   next();
 });
 
