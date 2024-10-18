@@ -79,12 +79,17 @@ const deleteMe = handleAsyncErrors(async (req, res, next) => {
 });
 
 // function to get all users
-const getAllUsers = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'This route is not defined yet...',
+const getAllUsers = handleAsyncErrors(async (req, res) => {
+  const users = await User.find();
+
+  res.status(200).json({
+    status: 'success',
+    result: users.length,
+    data: {
+      users,
+    },
   });
-};
+});
 
 // function to get one user
 const getUser = (req, res) => {
