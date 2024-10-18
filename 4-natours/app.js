@@ -1,5 +1,6 @@
 const express = require('express');
 const morgan = require('morgan');
+const rateLimit = require('express-rate-limit');
 
 // Import the global error handler function
 const globalErrorHandler = require('./controllers/errorController');
@@ -23,6 +24,25 @@ const app = express();
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
+
+// Rate Limiter function
+const limiter = rateLimit({
+  // Set the time window to 1 hour (60 minutes * 60 seconds * 1000 milliseconds)
+  windowMs: 60 * 60 * 1000,
+
+  // Limit each IP address to a maximum of 100 requests per 1-hour window
+  limit: 3,
+
+  // Custom response message sent when the limit is exceeded
+  message: 'Too many requests from this IP address! Try again after an hour.',
+});
+
+// Apply the rate limiter middleware to all routes that start with '/api'
+// This helps to:
+// - Prevent brute-force attacks by limiting the number of requests an IP can make in a given time
+// - Avoid Denial-of-Service (DoS) attacks that can overwhelm your API with too many requests
+// - Ensure fair usage of your API resources by controlling request rates
+app.use('/api', limiter);
 
 // Middleware to parse incoming JSON data from the request body
 // This allows us to access the parsed data via `req.body` in route handlers.
