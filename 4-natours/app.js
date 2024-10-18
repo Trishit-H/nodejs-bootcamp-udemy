@@ -35,7 +35,7 @@ const limiter = rateLimit({
   windowMs: 60 * 60 * 1000,
 
   // Limit each IP address to a maximum of 100 requests per 1-hour window
-  limit: 3,
+  limit: 100,
 
   // Custom response message sent when the limit is exceeded
   message: 'Too many requests from this IP address! Try again after an hour.',
@@ -50,7 +50,9 @@ app.use('/api', limiter);
 
 // Middleware to parse incoming JSON data from the request body
 // This allows us to access the parsed data via `req.body` in route handlers.
-app.use(express.json());
+// [LECTURE 144] Added the limit option to make sure that the size of the request object
+// does not exceed a certain amount. In this case, it is 30kb.
+app.use(express.json({ limit: '30kb' }));
 
 // Middleware to serve static files from the "public" directory
 // Any file placed in the public directory will be served directly (e.g., images, CSS, JavaScript files).
