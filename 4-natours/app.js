@@ -2,6 +2,7 @@ const express = require('express');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
+const mongoSanitize = require('express-mongo-sanitize');
 
 // Import the global error handler function
 const globalErrorHandler = require('./controllers/errorController');
@@ -53,6 +54,13 @@ app.use('/api', limiter);
 // [LECTURE 144] Added the limit option to make sure that the size of the request object
 // does not exceed a certain amount. In this case, it is 30kb.
 app.use(express.json({ limit: '30kb' }));
+
+// Data sanitization against NoSQL query injection
+// We use `express-mongo-sanitize` package to sanitize the data
+// It searches for any keys in objects that begin with a $ sign or contain a ., from req.body,
+// req.query, req.headers or req.params and completely removes these keys and associated data
+// from the object.
+app.use(mongoSanitize());
 
 // Middleware to serve static files from the "public" directory
 // Any file placed in the public directory will be served directly (e.g., images, CSS, JavaScript files).
