@@ -3,6 +3,7 @@ const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
+const hpp = require('hpp');
 
 // Import the global error handler function
 const globalErrorHandler = require('./controllers/errorController');
@@ -61,6 +62,41 @@ app.use(express.json({ limit: '30kb' }));
 // req.query, req.headers or req.params and completely removes these keys and associated data
 // from the object.
 app.use(mongoSanitize());
+
+// Middleware to prevent parameter pollution
+// We use the `hpp` package to prevent parameter pollution
+/**
+ * If we have a query like this - /tours?sort=duration&sort=price&page=2
+ * then the `req.query` object looks like this - { page: '2', sort: [ 'duration', 'price' ], limit: '3' }
+ * Here the values of duplicate keys are placed in an array.
+ * 
+ * What the `hpp` does is it checks if all top level parameters in `req.query` are in an array.
+ * If a parameter is in an array, the array is moved to `req.queryPolluted` and `req.query` is
+ * assigned the last value of the array.
+ * e.g. --
+ * req: {
+    query: {
+        page: '2',
+        limit: '3',
+        sort: 'price
+    },
+    queryPolluted: {
+        sort: [ 'duration', 'price' ]
+    }
+  }
+ */
+app.use(
+  hpp({
+    whitelist: [
+      'duration',
+      'ratingsQuantity',
+      'ratingsAverage',
+      'maxGroupSize',
+      'price',
+      'difficulty',
+    ],
+  })
+);
 
 // Middleware to serve static files from the "public" directory
 // Any file placed in the public directory will be served directly (e.g., images, CSS, JavaScript files).
